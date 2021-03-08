@@ -19,7 +19,11 @@ on:
   #    - cron: 0 8 * * 5
   #watch:
   #  types: [started]
-
+env:
+  BASE_PATH: padavan                # 基础目录
+  THEME_PATH: theme
+  WORK_PATH: /opt/rt-n56u           # 工作目录 一定要加 /
+  
 jobs:
   build:
     runs-on: ubuntu-20.04
@@ -44,9 +48,16 @@ jobs:
           sh dl_toolchain.sh
           mkdir -p /opt/images/
       - name: Recovery SSP bin files download from remote
+        env:
+          T_NAMES: "PSG1208"
         run: |
-          cp -f PSG1218/PSG1218.config /opt/rt-n56u/trunk/configs/templates/PSG1218.config
-          cp -f PSG1218/shadowsocks.sh /opt/rt-n56u/trunk/user/shadowsocks/scripts/shadowsocks.sh
+          cp -f $BASE_PATH/$t_item/${t_item}.config $WORK_PATH/trunk/configs/templates/${t_item}.config
+          cp -f $BASE_PATH/$t_item/shadowsocks.sh $WORK_PATH/trunk/user/shadowsocks/scripts/shadowsocks.sh
+          cp -f $BASE_PATH/$t_item/defaults.h $WORK_PATH/trunk/user/shared/defaults.h
+          cp -r $BASE_PATH/$t_item/$THEME_PATH  $WORK_PATH/
+          sudo rm -rf $WORK_PATH/trunk/user/www/n56u_ribbon_fixed/bootstrap
+          sudo rm -rf $WORK_PATH/trunk/user/www/n56u_ribbon_fixed/images
+          cp -rf $WORK_PATH/$THEME_PATH/. $WORK_PATH/trunk/user/www/n56u_ribbon_fixed
       - name: Get current time
         uses: 1466587594/get-current-time@v2
         id: current-time
