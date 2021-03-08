@@ -49,16 +49,41 @@ jobs:
           mkdir -p /opt/images/
       - name: Recovery SSP bin files download from remote
         env:
-          t_item: "PSG1208S"
+          T_NAMES: "PSG1208S"        # 设备名字数组
         run: |
-          cp -f $BASE_PATH/$t_item/${t_item}.config $WORK_PATH/trunk/configs/templates/${t_item}.config
-          cp -f $BASE_PATH/$t_item/shadowsocks.sh $WORK_PATH/trunk/user/shadowsocks/scripts/shadowsocks.sh
-          cp -f $BASE_PATH/$t_item/defaults.h $WORK_PATH/trunk/user/shared/defaults.h
-          cp -f $BASE_PATH/$t_item/kernel-3.4.x.config $WORK_PATH/trunk/configs/boards/PSG1208/kernel-3.4.x.config
-          cp -r $BASE_PATH/$t_item/$THEME_PATH  $WORK_PATH/
-          sudo rm -rf $WORK_PATH/trunk/user/www/n56u_ribbon_fixed/bootstrap
-          sudo rm -rf $WORK_PATH/trunk/user/www/n56u_ribbon_fixed/images
-          cp -rf $WORK_PATH/$THEME_PATH/. $WORK_PATH/trunk/user/www/n56u_ribbon_fixed
+          # 循环替换自定义默认模板和构建，单个设备的 sh 拷贝 t_item 需要编译的固件名字
+          for t_item in $T_NAMES;
+          do
+          if [ -f $BASE_PATH/$t_item/${t_item}.config ] ; then
+            mv -f $BASE_PATH/$t_item/${t_item}.config $WORK_PATH/trunk/configs/templates/${t_item}.config
+            echo "${t_item} config文件拷贝成功"
+          fi
+          if [ -f $BASE_PATH/$t_item/shadowsocks.sh ] ; then
+            mv -f $BASE_PATH/$t_item/shadowsocks.sh $WORK_PATH/trunk/user/shadowsocks/scripts/shadowsocks.sh
+          echo "shadowsocks SH文件拷贝成功"
+          fi
+          if [ -f $BASE_PATH/$t_item/defaults.h ] ; then
+            mv -f $BASE_PATH/$t_item/defaults.h $WORK_PATH/trunk/user/shared/defaults.h
+            echo "${t_item} 配置文件拷贝成功"
+          fi
+          if [ -f $BASE_PATH/$t_item/kernel-3.4.x.config ] ; then
+            mv -f $BASE_PATH/$t_item/kernel-3.4.x.config $WORK_PATH/trunk/configs/boards/PSG1208/kernel-3.4.x.config
+            echo "${t_item} kernel文件拷贝成功"
+          fi
+          if [ ! -d $BASE_PATH/$t_item/$THEME_PATH ] ; then
+            echo "${BASE_PATH}/${t_item}/${THEME_PATH} 自定义主题文件夹未找到"
+          elif [! -d $WORK_PATH/$THEME_PATH ] ; then
+                cp -r $BASE_PATH/$t_item/$THEME_PATH  $WORK_PATH/
+                echo "${THEME_PATH} 自定义主题文件夹拷贝成功"  
+             else
+                rm -rf $WORK_PATH/$THEME_PATH
+                cp -r $BASE_PATH/$t_item/$THEME_PATH  $WORK_PATH/
+                sudo rm -rf $WORK_PATH/trunk/user/www/n56u_ribbon_fixed/bootstrap
+                sudo rm -rf $WORK_PATH/trunk/user/www/n56u_ribbon_fixed/images
+                cp -rf $WORK_PATH/$THEME_PATH/. $WORK_PATH/trunk/user/www/n56u_ribbon_fixed
+                echo "${THEME_PATH} 复制主题文件结束"  
+          fi
+          done
       - name: Get current time
         uses: 1466587594/get-current-time@v2
         id: current-time
