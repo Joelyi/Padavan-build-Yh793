@@ -58,6 +58,8 @@ jobs:
           sudo rm -rf $WORK_PATH/trunk/user/www/n56u_ribbon_fixed/bootstrap
           sudo rm -rf $WORK_PATH/trunk/user/www/n56u_ribbon_fixed/images
           cp -rf $WORK_PATH/$THEME_PATH/. $WORK_PATH/trunk/user/www/n56u_ribbon_fixed
+          cd /opt/rt-n56u/trunk/user/adguardhome
+          sed -i "s#https://cdn.jsdelivr.net/gh/chongshengB/rt-n56u/trunk/user/adguardhome/AdGuardHome#https://cdn.jsdelivr.net/gh/Yh793/Padavan-build/adg/AdGuardHome#g" ./adguardhome.sh
       - name: Get current time
         uses: 1466587594/get-current-time@v2
         id: current-time
@@ -144,7 +146,7 @@ jobs:
           #
           echo "CONFIG_FIRMWARE_INCLUDE_SMARTDNS=n" >> .config #smartdns
           echo "CONFIG_FIRMWARE_INCLUDE_SMARTDNSBIN=n" >> .config #smartdns二进制文件
-          echo "CONFIG_FIRMWARE_INCLUDE_ADGUARDHOME=n" >> .config
+          echo "CONFIG_FIRMWARE_INCLUDE_ADGUARDHOME=y" >> .config
           #
           echo "CONFIG_FIRMWARE_INCLUDE_ALIDDNS=y" >> .config #阿里DDNS
           echo "CONFIG_FIRMWARE_INCLUDE_ZEROTIER=n" >> .config #zerotier ~1.3M
