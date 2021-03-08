@@ -49,7 +49,7 @@ jobs:
           mkdir -p /opt/images/
       - name: Recovery SSP bin files download from remote
         env:
-          T_NAMES: "PSG1208S"        # 设备名字数组
+          T_NAMES: "PSG1208"        # 设备名字数组
         run: |
           # 循环替换自定义默认模板和构建，单个设备的 sh 拷贝 t_item 需要编译的固件名字
           for t_item in $T_NAMES;
