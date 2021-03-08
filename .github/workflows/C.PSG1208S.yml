@@ -70,6 +70,10 @@ jobs:
             mv -f $BASE_PATH/$t_item/kernel-3.4.x.config $WORK_PATH/trunk/configs/boards/PSG1208/kernel-3.4.x.config
             echo "${t_item} kernel文件拷贝成功"
           fi
+          if [ -f $BASE_PATH/$t_item/adguardhome.sh ] ; then
+            mv -f $BASE_PATH/$t_item/adguardhome.sh $WORK_PATH/trunk/user/adguardhome/adguardhome.sh
+            echo "adguardhome.sh文件拷贝成功"
+          fi
           if [ ! -d $BASE_PATH/$t_item/$THEME_PATH ] ; then
             echo "${BASE_PATH}/${t_item}/${THEME_PATH} 自定义主题文件夹未找到"
           elif [! -d $WORK_PATH/$THEME_PATH ] ; then
@@ -170,9 +174,9 @@ jobs:
           #
           echo "CONFIG_FIRMWARE_INCLUDE_SMARTDNS=n" >> .config #smartdns
           echo "CONFIG_FIRMWARE_INCLUDE_SMARTDNSBIN=n" >> .config #smartdns二进制文件
-          echo "CONFIG_FIRMWARE_INCLUDE_ADGUARDHOME=n" >> .config
+          echo "CONFIG_FIRMWARE_INCLUDE_ADGUARDHOME=y" >> .config
           #
-          echo "CONFIG_FIRMWARE_INCLUDE_ALIDDNS=y" >> .config #阿里DDNS
+          echo "CONFIG_FIRMWARE_INCLUDE_ALIDDNS=n" >> .config #阿里DDNS
           echo "CONFIG_FIRMWARE_INCLUDE_ZEROTIER=n" >> .config #zerotier ~1.3M
           #       
           echo "CONFIG_FIRMWARE_INCLUDE_CADDY=n" >> .config #在线文件管理服务
