@@ -46,7 +46,7 @@ jobs:
         mkdir -p toolchain-3.4.x
         wget $TOOLCHAIN_URL
         tar -xvf mipsel-linux-uclibc.tar.xz -C toolchain-3.4.x
-      - name: Recovery SSP bin files download from remote
+    - name: Recovery SSP bin files download from remote
         env:
           T_NAMES: "PSG1208S"        # 设备名字数组
         run: |
