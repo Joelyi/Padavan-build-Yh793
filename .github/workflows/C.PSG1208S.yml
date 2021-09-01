@@ -22,7 +22,7 @@ on:
 env:
   BASE_PATH: padavan                # 基础目录
   THEME_PATH: theme
-  WORK_PATH: /opt/rt-n56u           # 工作目录 一定要加 /
+  WORK_PATH: /opt/Padavan           # 工作目录 一定要加 /
   
 jobs:
   build:
@@ -43,8 +43,8 @@ jobs:
           pkg-config zlib1g-dev libgmp3-dev libmpc-dev libmpfr-dev libncurses5-dev libltdl-dev wget libc-dev-bin
       - name: Clone source code
         run: |
-          git clone -b chongshengB --depth=1 https://github.com/keke1023/Padavan.git /opt/rt-n56u
-          cd /opt/rt-n56u/toolchain-mipsel
+          git clone -b chongshengB --depth=1 https://github.com/keke1023/Padavan.git /opt/Padavan
+          cd /opt/Padavan/toolchain-mipsel
           sh dl_toolchain.sh
           mkdir -p /opt/images/
       - name: Recovery SSP bin files download from remote
