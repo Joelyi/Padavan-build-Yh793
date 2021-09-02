@@ -22,7 +22,7 @@ on:
 env:
   BASE_PATH: padavan                # 基础目录
   THEME_PATH: theme
-  WORK_PATH: /opt/Padavan           # 工作目录 一定要加 /
+  WORK_PATH: /opt/rt-n56u           # 工作目录 一定要加 /
   
 jobs:
   build:
