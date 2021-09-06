@@ -19,11 +19,7 @@ on:
   #    - cron: 0 8 * * 5
   #watch:
   #  types: [started]
-env:
-  BASE_PATH: padavan                # 基础目录
-  THEME_PATH: theme
-  WORK_PATH: /opt/rt-n56u           # 工作目录 一定要加 /
-  
+
 jobs:
   build:
     runs-on: ubuntu-20.04
@@ -43,10 +39,11 @@ jobs:
           pkg-config zlib1g-dev libgmp3-dev libmpc-dev libmpfr-dev libncurses5-dev libltdl-dev wget libc-dev-bin
       - name: Clone source code
         run: |
-          git clone --depth=1 https://github.com/hanwckf/rt-n56u.git /opt/rt-n56u
+          git clone -b chongshengB --depth=1 https://github.com/Yh793/rt-n56u.git /opt/rt-n56u
           cd /opt/rt-n56u/toolchain-mipsel
           sh dl_toolchain.sh
           mkdir -p /opt/images/
+
       - name: Recovery SSP bin files download from remote
         env:
           T_NAMES: "PSG1208S"        # 设备名字数组
@@ -84,6 +81,7 @@ jobs:
                 echo "${THEME_PATH} 复制主题文件结束"  
           fi
           done
+
       - name: Get current time
         uses: 1466587594/get-current-time@v2
         id: current-time
@@ -149,10 +147,10 @@ jobs:
           echo "CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_CMD=n" >> .config #SOFTETHERVPN
           echo "CONFIG_FIRMWARE_INCLUDE_SFE=n" >> .config #集成SFE加速
           #
-          echo "CONFIG_FIRMWARE_INCLUDE_SHADOWSOCKS=n" >> .config #SS plus+
+          echo "CONFIG_FIRMWARE_INCLUDE_SHADOWSOCKS=y" >> .config #SS plus+
           echo "CONFIG_FIRMWARE_INCLUDE_V2RAY=n" >> .config #集成v2ray执行文件（3.8M左右)，如果不集成，会从网上下载下来执行，不影响正常使用
           echo "CONFIG_FIRMWARE_INCLUDE_TROJAN=n" >> .config #集成trojan执行文件(1.1M左右)，如果不集成，会从网上下载下来执行，不影响正常使用
-          echo "CONFIG_FIRMWARE_INCLUDE_SSOBFS=n" >> .config # simple-obfs混淆插件
+          echo "CONFIG_FIRMWARE_INCLUDE_SSOBFS=y" >> .config # simple-obfs混淆插件
           echo "CONFIG_FIRMWARE_INCLUDE_SSSERVER=n" >> .config #SS server
           echo "CONFIG_FIRMWARE_INCLUDE_KUMASOCKS=n" >> .config #socks5
           #
@@ -165,7 +163,7 @@ jobs:
           echo "CONFIG_FIRMWARE_INCLUDE_FRPC=n" >> .config #内网穿透FRPC
           echo "CONFIG_FIRMWARE_INCLUDE_FRPS=n" >> .config #内网穿透FRPS
           #
-          echo "CONFIG_FIRMWARE_INCLUDE_ADBYBY=n" >> .config #adbyby plus+
+          echo "CONFIG_FIRMWARE_INCLUDE_ADBYBY=y" >> .config #adbyby plus+
           echo "CONFIG_FIRMWARE_INCLUDE_KOOLPROXY=n" >> .config #KP广告过滤
           #
           echo "CONFIG_FIRMWARE_INCLUDE_SMARTDNS=n" >> .config #smartdns
