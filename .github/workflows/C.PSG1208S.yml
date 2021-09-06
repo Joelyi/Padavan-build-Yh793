@@ -46,7 +46,10 @@ jobs:
 
       - name: Recovery SSP bin files download from remote
         env:
-          T_NAMES: "PSG1208S"        # 设备名字数组
+          T_NAMES: "PSG1208S"               # 设备名字数组
+          BASE_PATH: padavan                # 基础目录
+          THEME_PATH: theme                 # 主题目录
+          WORK_PATH: /opt/rt-n56u           # 工作目录 一定要加 /
         run: |
           # 循环替换自定义默认模板和构建，单个设备的 sh 拷贝 t_item 需要编译的固件名字
           for t_item in $T_NAMES;
