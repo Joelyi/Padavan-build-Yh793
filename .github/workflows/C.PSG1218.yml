@@ -19,10 +19,6 @@ on:
   #    - cron: 0 8 * * 5
   #watch:
   #  types: [started]
-env:
-  BASE_PATH: padavan                # 基础目录
-  THEME_PATH: theme
-  WORK_PATH: /opt/rt-n56u           # 工作目录 一定要加 /
   
 jobs:
   build:
@@ -49,16 +45,40 @@ jobs:
           mkdir -p /opt/images/
       - name: Recovery SSP bin files download from remote
         env:
-          t_item: "PSG1218"
+          T_NAMES: "PSG1218"                # 设备名字数组
+          BASE_PATH: padavan                # 基础目录
+          THEME_PATH: theme                 # 主题目录
+          WORK_PATH: /opt/rt-n56u           # 工作目录 一定要加 /
         run: |
-          cp -f $BASE_PATH/$t_item/${t_item}.config $WORK_PATH/trunk/configs/templates/${t_item}.config
-          cp -f $BASE_PATH/$t_item/shadowsocks.sh $WORK_PATH/trunk/user/shadowsocks/scripts/shadowsocks.sh
-          cp -f $BASE_PATH/$t_item/defaults.h $WORK_PATH/trunk/user/shared/defaults.h
-          cp -f $BASE_PATH/$t_item/adguardhome.sh $WORK_PATH/trunk/user/adguardhome/adguardhome.sh
-          cp -r $BASE_PATH/$t_item/$THEME_PATH  $WORK_PATH/
-          sudo rm -rf $WORK_PATH/trunk/user/www/n56u_ribbon_fixed/bootstrap
-          sudo rm -rf $WORK_PATH/trunk/user/www/n56u_ribbon_fixed/images
-          cp -rf $WORK_PATH/$THEME_PATH/. $WORK_PATH/trunk/user/www/n56u_ribbon_fixed
+          # 循环替换自定义默认模板和构建，单个设备的 sh 拷贝 t_item 需要编译的固件名字
+          for t_item in $T_NAMES;
+          do
+          if [ -f $BASE_PATH/$t_item/${t_item}.config ] ; then
+            mv -f $BASE_PATH/$t_item/${t_item}.config $WORK_PATH/trunk/configs/templates/${t_item}.config
+            echo "${t_item} config文件拷贝成功"
+          fi
+          if [ -f $BASE_PATH/$t_item/shadowsocks.sh ] ; then
+            mv -f $BASE_PATH/$t_item/shadowsocks.sh $WORK_PATH/trunk/user/shadowsocks/scripts/shadowsocks.sh
+          echo "shadowsocks SH文件拷贝成功"
+          fi
+          if [ -f $BASE_PATH/$t_item/defaults.h ] ; then
+            mv -f $BASE_PATH/$t_item/defaults.h $WORK_PATH/trunk/user/shared/defaults.h
+            echo "${t_item} 配置文件拷贝成功"
+          fi
+          if [ ! -d $BASE_PATH/$t_item/$THEME_PATH ] ; then
+            echo "${BASE_PATH}/${t_item}/${THEME_PATH} 自定义主题文件夹未找到"
+          elif [! -d $WORK_PATH/$THEME_PATH ] ; then
+                cp -r $BASE_PATH/$t_item/$THEME_PATH  $WORK_PATH/
+                echo "${THEME_PATH} 自定义主题文件夹拷贝成功"  
+             else
+                rm -rf $WORK_PATH/$THEME_PATH
+                cp -r $BASE_PATH/$t_item/$THEME_PATH  $WORK_PATH/
+                sudo rm -rf $WORK_PATH/trunk/user/www/n56u_ribbon_fixed/bootstrap
+                sudo rm -rf $WORK_PATH/trunk/user/www/n56u_ribbon_fixed/images
+                cp -rf $WORK_PATH/$THEME_PATH/. $WORK_PATH/trunk/user/www/n56u_ribbon_fixed
+                echo "${THEME_PATH} 复制主题文件结束"  
+          fi
+          done
       - name: Get current time
         uses: 1466587594/get-current-time@v2
         id: current-time
@@ -73,7 +93,7 @@ jobs:
 
       - name: Build Firmware
         env:
-          TNAME: PSG1218 #PSG1218 K2P-5.0 K2P K2P_nano K2P_nano-5.0 PSG1208 PSG1218_nano
+          TNAME: PSG1218
         run: |
           cd /opt/rt-n56u/trunk
           if [ ! -f configs/templates/$TNAME.config ] ; then
@@ -127,7 +147,7 @@ jobs:
           echo "CONFIG_FIRMWARE_INCLUDE_SHADOWSOCKS=y" >> .config #SS plus+
           echo "CONFIG_FIRMWARE_INCLUDE_V2RAY=n" >> .config #集成v2ray执行文件（3.8M左右)，如果不集成，会从网上下载下来执行，不影响正常使用
           echo "CONFIG_FIRMWARE_INCLUDE_TROJAN=n" >> .config #集成trojan执行文件(1.1M左右)，如果不集成，会从网上下载下来执行，不影响正常使用
-          echo "CONFIG_FIRMWARE_INCLUDE_SSOBFS=n" >> .config # simple-obfs混淆插件
+          echo "CONFIG_FIRMWARE_INCLUDE_SSOBFS=y" >> .config # simple-obfs混淆插件
           echo "CONFIG_FIRMWARE_INCLUDE_SSSERVER=n" >> .config #SS server
           echo "CONFIG_FIRMWARE_INCLUDE_KUMASOCKS=n" >> .config #socks5
           #
@@ -140,7 +160,7 @@ jobs:
           echo "CONFIG_FIRMWARE_INCLUDE_FRPC=n" >> .config #内网穿透FRPC
           echo "CONFIG_FIRMWARE_INCLUDE_FRPS=n" >> .config #内网穿透FRPS
           #
-          echo "CONFIG_FIRMWARE_INCLUDE_ADBYBY=n" >> .config #adbyby plus+
+          echo "CONFIG_FIRMWARE_INCLUDE_ADBYBY=y" >> .config #adbyby plus+
           echo "CONFIG_FIRMWARE_INCLUDE_KOOLPROXY=n" >> .config #KP广告过滤
           #
           echo "CONFIG_FIRMWARE_INCLUDE_SMARTDNS=n" >> .config #smartdns
