@@ -43,6 +43,7 @@ jobs:
           cd /opt/rt-n56u/toolchain-mipsel
           sh dl_toolchain.sh
           mkdir -p /opt/images/
+
       - name: Recovery SSP bin files download from remote
         env:
           T_NAMES: "PSG1218"                # 设备名字数组
@@ -79,6 +80,7 @@ jobs:
                 echo "${THEME_PATH} 复制主题文件结束"  
           fi
           done
+
       - name: Get current time
         uses: 1466587594/get-current-time@v2
         id: current-time
