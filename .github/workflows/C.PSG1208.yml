@@ -19,10 +19,6 @@ on:
   #    - cron: 0 8 * * 5
   #watch:
   #  types: [started]
-env:
-  BASE_PATH: padavan                # 基础目录
-  THEME_PATH: theme
-  WORK_PATH: /opt/rt-n56u           # 工作目录 一定要加 /
   
 jobs:
   build:
@@ -50,6 +46,9 @@ jobs:
       - name: Recovery SSP bin files download from remote
         env:
           T_NAMES: "PSG1208"        # 设备名字数组
+          BASE_PATH: padavan                # 基础目录
+          THEME_PATH: theme
+          WORK_PATH: /opt/rt-n56u           # 工作目录 一定要加 /
         run: |
           # 循环替换自定义默认模板和构建，单个设备的 sh 拷贝 t_item 需要编译的固件名字
           for t_item in $T_NAMES;
@@ -65,10 +64,6 @@ jobs:
           if [ -f $BASE_PATH/$t_item/defaults.h ] ; then
             mv -f $BASE_PATH/$t_item/defaults.h $WORK_PATH/trunk/user/shared/defaults.h
             echo "${t_item} 配置文件拷贝成功"
-          fi
-          if [ -f $BASE_PATH/$t_item/adguardhome.sh ] ; then
-            mv -f $BASE_PATH/$t_item/adguardhome.sh $WORK_PATH/trunk/user/adguardhome/adguardhome.sh
-            echo "adguardhome.sh文件拷贝成功"
           fi
           if [ ! -d $BASE_PATH/$t_item/$THEME_PATH ] ; then
             echo "${BASE_PATH}/${t_item}/${THEME_PATH} 自定义主题文件夹未找到"
