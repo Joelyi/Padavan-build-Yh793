@@ -41,10 +41,12 @@ jobs:
           cd /opt/rt-n56u/toolchain-mipsel
           sh dl_toolchain.sh
           mkdir -p /opt/images/
-
       - name: Recovery bin files download from remote
         env:
-          T_NAMES: "PSG1208S"        # 设备名字数组
+          T_NAMES: "PSG1208S"                # 设备名字数组
+          BASE_PATH: padavan                # 基础目录
+          THEME_PATH: theme                 # 主题目录
+          WORK_PATH: /opt/rt-n56u           # 工作目录 一定要加 /
         run: |
           # 循环替换自定义默认模板和构建，单个设备的 sh 拷贝 t_item 需要编译的固件名字
           for t_item in $T_NAMES;
@@ -56,10 +58,6 @@ jobs:
           if [ -f $BASE_PATH/$t_item/defaults.h ] ; then
             mv -f $BASE_PATH/$t_item/defaults.h $WORK_PATH/trunk/user/shared/defaults.h
             echo "${t_item} 配置文件拷贝成功"
-          fi
-          if [ -f $BASE_PATH/$t_item/kernel-3.4.x.config ] ; then
-            mv -f $BASE_PATH/$t_item/kernel-3.4.x.config $WORK_PATH/trunk/configs/boards/PSG1208/kernel-3.4.x.config
-            echo "${t_item} kernel文件拷贝成功"
           fi
           if [ ! -d $BASE_PATH/$t_item/$THEME_PATH ] ; then
             echo "${BASE_PATH}/${t_item}/${THEME_PATH} 自定义主题文件夹未找到"
@@ -75,7 +73,6 @@ jobs:
                 echo "${THEME_PATH} 复制主题文件结束"  
           fi
           done
-
       - name: Get current time
         uses: 1466587594/get-current-time@v2
         id: current-time
@@ -94,7 +91,6 @@ jobs:
           exit 1
           fi
           cp -f configs/templates/$TNAME.config .config
-
           sed -i '/CONFIG_FIRMWARE_INCLUDE_SFE/d' configs/templates/$TNAME.config #删除配置项SFE加速
           echo "CONFIG_FIRMWARE_INCLUDE_SFE=n" >> configs/templates/$TNAME.config #集成SFE加速
           sed -i '/CONFIG_FIRMWARE_INCLUDE_REDSOCKS/d' configs/templates/$TNAME.config
@@ -103,7 +99,6 @@ jobs:
           sudo ./build_firmware_modify $TNAME 0
           sudo mv -f images/*.trx /opt/images/${TNAME}_Hanwckf_${{ steps.current-time.outputs.formattedTime }}.trx
           echo "FNAME=$TNAME" >> $GITHUB_ENV
-
       - name: Organize files
         id: organize
         run: |
