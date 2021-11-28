@@ -215,7 +215,7 @@ jobs:
         uses: actions/upload-artifact@main
         if: steps.organize.outputs.status == 'success'
         with:
-          name: Padavan-packages
+          name: Padavan-C.PSG1208S-packages
           path: /opt/images
       #上传到WeTransfer
       - name: Upload firmware to WeTransfer
