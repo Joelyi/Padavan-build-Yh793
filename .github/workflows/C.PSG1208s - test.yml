@@ -66,12 +66,12 @@ jobs:
             mv -f $BASE_PATH/$t_item/kernel-3.4.x.config $WORK_PATH/trunk/configs/boards/PSG1208/kernel-3.4.x.config
             echo "${t_item} kernel文件拷贝成功"
           fi
-          if [ ! -d $BASE_PATH/$t_item/$THEME_PATH ] ; then
-                cp -r $BASE_PATH/$t_item/$THEME_PATH  $WORK_PATH/
-                sudo rm -rf $WORK_PATH/trunk/user/www/n56u_ribbon_fixed/bootstrap
-                sudo rm -rf $WORK_PATH/trunk/user/www/n56u_ribbon_fixed/images
-                cp -rf $WORK_PATH/$THEME_PATH/. $WORK_PATH/trunk/user/www/n56u_ribbon_fixed
-                echo "${THEME_PATH} 复制主题文件结束"  
+          if [ -f $BASE_PATH/$t_item/$THEME_PATH ] ; then
+            cp -r $BASE_PATH/$t_item/$THEME_PATH  $WORK_PATH/
+            sudo rm -rf $WORK_PATH/trunk/user/www/n56u_ribbon_fixed/bootstrap
+            sudo rm -rf $WORK_PATH/trunk/user/www/n56u_ribbon_fixed/images
+            cp -rf $WORK_PATH/$THEME_PATH/. $WORK_PATH/trunk/user/www/n56u_ribbon_fixed
+            echo "${THEME_PATH} 复制主题文件结束"  
           fi
           done
           
