@@ -67,12 +67,6 @@ jobs:
             echo "${t_item} kernel文件拷贝成功"
           fi
           if [ ! -d $BASE_PATH/$t_item/$THEME_PATH ] ; then
-            echo "${BASE_PATH}/${t_item}/${THEME_PATH} 自定义主题文件夹未找到"
-          elif [! -d $WORK_PATH/$THEME_PATH ] ; then
-                cp -r $BASE_PATH/$t_item/$THEME_PATH  $WORK_PATH/
-                echo "${THEME_PATH} 自定义主题文件夹拷贝成功"  
-             else
-                rm -rf $WORK_PATH/$THEME_PATH
                 cp -r $BASE_PATH/$t_item/$THEME_PATH  $WORK_PATH/
                 sudo rm -rf $WORK_PATH/trunk/user/www/n56u_ribbon_fixed/bootstrap
                 sudo rm -rf $WORK_PATH/trunk/user/www/n56u_ribbon_fixed/images
@@ -144,7 +138,7 @@ jobs:
           echo "CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_SERVER=n" >> .config #SOFTETHERVPN
           echo "CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_CLIENT=n" >> .config #SOFTETHERVPN
           echo "CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_CMD=n" >> .config #SOFTETHERVPN
-          echo "CONFIG_FIRMWARE_INCLUDE_SFE=y" >> .config #集成SFE加速
+          echo "CONFIG_FIRMWARE_INCLUDE_SFE=n" >> .config #集成SFE加速
           #
           echo "CONFIG_FIRMWARE_INCLUDE_SHADOWSOCKS=n" >> .config #SS plus+
           echo "CONFIG_FIRMWARE_INCLUDE_V2RAY=n" >> .config #集成v2ray执行文件（3.8M左右)，如果不集成，会从网上下载下来执行，不影响正常使用
