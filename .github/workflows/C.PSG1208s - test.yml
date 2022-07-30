@@ -51,8 +51,6 @@ jobs:
       - name: Clone source code
         run: |
           git clone -b chongshengB --depth=1 https://github.com/Yh793/rt-n56u.git /opt/rt-n56u
-          cd /opt/rt-n56u/toolchain-mipsel
-          sh dl_toolchain.sh
           mkdir -p /opt/images/
           #
           cd /opt/padavan/PSG1208s/
@@ -60,6 +58,9 @@ jobs:
           #
           cd /opt/padavan/Theme/
           sh install_Theme.sh
+          #
+          cd /opt/rt-n56u/toolchain-mipsel
+          sh dl_toolchain.sh
           #
                     
       - name: Get current time
