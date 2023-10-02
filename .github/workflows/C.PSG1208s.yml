@@ -76,7 +76,7 @@ jobs:
           cd /opt/rt-n56u/trunk/user/rc
           sed -i '/DNS_RELAY_CACHE_MAX/d' ./services_ex.c
 
-      - name: Recovery SSP bin files download from remote
+      - name: Recovery bin files download from remote
         run: |
           cd /opt/padavan/PSG1208s/
           sh install_Setconfig.sh
