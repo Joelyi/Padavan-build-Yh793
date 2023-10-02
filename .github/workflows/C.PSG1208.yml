@@ -138,7 +138,7 @@ jobs:
           echo "CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_SERVER=n" >> .config #SOFTETHERVPN
           echo "CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_CLIENT=n" >> .config #SOFTETHERVPN
           echo "CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_CMD=n" >> .config #SOFTETHERVPN
-          echo "CONFIG_FIRMWARE_WEBUI_HIDE_VPN=y" >> .config
+          echo "CONFIG_FIRMWARE_WEBUI_HIDE_VPN=n" >> .config
           echo "CONFIG_FIRMWARE_INCLUDE_SFE=n" >> .config #集成SFE加速
           #
           echo "CONFIG_FIRMWARE_INCLUDE_SHADOWSOCKS=n" >> .config #SS plus+
