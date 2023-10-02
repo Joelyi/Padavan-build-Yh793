@@ -73,10 +73,10 @@ jobs:
           sed -i '/DNS_RELAY_CACHE_MAX/d' ./services_ex.c
 
       - name: Get current time
-        uses: 1466587594/get-current-time@v2
+        uses: josStorer/get-current-time@v2
         id: current-time
         with:
-          format: YY.MMDDHH
+          format: YYYYMMDD-HH
           utcOffset: "+08:00"
 
       - name: Build Firmware
