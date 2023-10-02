@@ -43,6 +43,16 @@ jobs:
           token: ${{ secrets.R_TOKEN }}
       - name: Prepare
         run: |
+         echo "###########################"
+          pwd
+          #
+          sudo mv padavan /opt/
+          cd /opt/padavan
+          echo "sudo ls -l"
+          pwd
+          sudo ls -l
+          echo "###########################"
+          #
           sudo apt-get update
           sudo apt update
           sudo apt install libtool-bin gperf python3-docutils autopoint gettext ccache
