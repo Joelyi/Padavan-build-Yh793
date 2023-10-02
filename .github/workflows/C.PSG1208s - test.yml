@@ -73,11 +73,12 @@ jobs:
           sed -i '/DNS_RELAY_CACHE_MAX/d' ./services_ex.c
 
       - name: Get current time
-        uses: josStorer/get-current-time@v2.0.2
+        uses: 1466587594/get-current-time@v2
         id: current-time
         with:
           format: YY.MMDDHH
           utcOffset: "+08:00"
+
       - name: Build Firmware
         env:
           TNAME: PSG1208S #PSG1218 K2P-5.0 K2P K2P_nano K2P_nano-5.0 PSG1208 PSG1218_nano
