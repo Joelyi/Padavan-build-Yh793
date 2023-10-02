@@ -70,14 +70,14 @@ jobs:
 
       - name: Recovery SSP bin files download from remote
         run: |
-          cd /padavan/PSG1208s/
+          cd /opt/padavan/PSG1208s/
           sh install_Setconfig.sh
           #
-          cd /padavan/Theme/
+          cd /opt/padavan/Theme/
           sh install_Theme.sh
 
       - name: Get current time
-        uses: 1466587594/get-current-time@v2
+        uses: josStorer/get-current-time@v2.0.2
         id: current-time
         with:
           format: YY.MMDDHH
