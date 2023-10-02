@@ -78,6 +78,7 @@ jobs:
         with:
           format: YYYYMMDD-HH
           utcOffset: "+08:00"
+        run: echo $TIME $R_TIME $F_TIME $YEAR $DAY
 
       - name: Build Firmware
         env:
