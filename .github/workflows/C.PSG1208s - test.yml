@@ -78,8 +78,6 @@ jobs:
         with:
           format: YYYYMMDD-HH
           utcOffset: "+08:00"
-        run: echo $TIME $R_TIME $F_TIME $YEAR $DAY
-
       - name: Build Firmware
         env:
           TNAME: PSG1208S #PSG1218 K2P-5.0 K2P K2P_nano K2P_nano-5.0 PSG1208 PSG1218_nano
