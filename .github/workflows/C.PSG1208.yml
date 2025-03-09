@@ -42,7 +42,15 @@ jobs:
           cd /opt/rt-n56u/toolchain-mipsel
           sh dl_toolchain.sh
           mkdir -p /opt/images/
-
+          
+      - name: Recovery bin files download from remote
+        run: |
+          cd /opt/padavan/PSG1208s/
+          sh install_Setconfig.sh
+          #
+          cd /opt/padavan/Theme/
+          sh install_Theme.sh
+          
       - name: Get current time
         uses: 1466587594/get-current-time@v2
         id: current-time
