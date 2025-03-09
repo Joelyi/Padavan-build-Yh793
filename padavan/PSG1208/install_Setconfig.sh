@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DESTDIR=/opt/rt-n56u
-ROOTDIR=`pwd`
+ROOTDIR=`/padavan/PSG1208`
 CONFIG_FILENAME=PSG1208.config
 
     echo "--------------开始复制配置文件----------------------"
