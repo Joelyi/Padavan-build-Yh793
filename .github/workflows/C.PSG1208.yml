@@ -54,12 +54,12 @@ jobs:
           mkdir -p /opt/images/
           
       - name: Recovery bin files download from remote
-         run: |
-           cd /opt/padavan/PSG1208/
-           sh install_Setconfig.sh
-           #
-           cd /opt/padavan/Theme/
-           sh install_Theme.sh
+        run: |
+          cd /opt/padavan/PSG1208/
+          sh install_Setconfig.sh
+          #
+          cd /opt/padavan/Theme/
+          sh install_Theme.sh
           
       - name: Get current time
         uses: 1466587594/get-current-time@v2
@@ -69,7 +69,7 @@ jobs:
           utcOffset: "+08:00"
       - name: Build Firmware
         env:
-          TNAME: PSG1208
+          TNAME: PSG1208_nano
         run: |
           cd /opt/rt-n56u/trunk
           if [ ! -f configs/templates/$TNAME.config ] ; then
