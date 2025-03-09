@@ -45,9 +45,6 @@ jobs:
           
       - name: Recovery bin files download from remote
         run: |
-          cd /opt/padavan/PSG1208/
-          sh install_Setconfig.sh
-          #
           cd /opt/padavan/Theme/
           sh install_Theme.sh
           
