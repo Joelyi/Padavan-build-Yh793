@@ -1,5 +1,5 @@
 #修改TNAME: K2P-5.0 中的K2P-5.0为你需要编译的型号，注意名称要与configs/templates/目录下的名字相同
-name: C.PSG1218
+name: C.PSG1208
 
 on:
   workflow_dispatch:
@@ -33,6 +33,16 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
           token: ${{ secrets.GITHUB_TOKEN }}
         run: |
+         echo "###########################"
+           pwd
+           #
+           sudo mv padavan /opt/
+           cd /opt/padavan
+           echo "sudo ls -l"
+           pwd
+           sudo ls -l
+           echo "###########################"
+           #
           sudo apt-get update
           sudo apt update
           sudo apt install libtool-bin gperf python3-docutils autopoint gettext ccache
@@ -42,7 +52,15 @@ jobs:
           cd /opt/rt-n56u/toolchain-mipsel
           sh dl_toolchain.sh
           mkdir -p /opt/images/
-
+          
+      - name: Recovery bin files download from remote
+        run: |
+          cd /opt/padavan/PSG1218/
+          sh install_Setconfig.sh
+          #
+          cd /opt/padavan/Theme/
+          sh install_Theme.sh
+          
       - name: Get current time
         uses: 1466587594/get-current-time@v2
         id: current-time
@@ -51,7 +69,7 @@ jobs:
           utcOffset: "+08:00"
       - name: Build Firmware
         env:
-          TNAME: PSG1218_nano 
+          TNAME: PSG1218
         run: |
           cd /opt/rt-n56u/trunk
           if [ ! -f configs/templates/$TNAME.config ] ; then
