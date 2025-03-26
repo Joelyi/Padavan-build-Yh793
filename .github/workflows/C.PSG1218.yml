@@ -69,7 +69,7 @@ jobs:
           utcOffset: "+08:00"
       - name: Build Firmware
         env:
-          TNAME: PSG1218
+          TNAME: PSG1218_nano
         run: |
           cd /opt/rt-n56u/trunk
           if [ ! -f configs/templates/$TNAME.config ] ; then
