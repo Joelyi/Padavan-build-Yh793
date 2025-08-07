@@ -36,6 +36,23 @@ jobs:
           sudo apt-get update
           sudo apt update
           sudo apt install libtool-bin gperf python3-docutils autopoint gettext ccache
+      - name: Prepare
+        run: |
+         echo "###########################"
+          pwd
+          #
+          sudo mv padavan /opt/
+          cd /opt/padavan
+          echo "sudo ls -l"
+          pwd
+          sudo ls -l
+          echo "###########################"
+          #
+          sudo apt-get update
+          sudo apt update
+          sudo apt install libtool-bin gperf python3-docutils autopoint gettext ccache
+          # https://github.com/actions/setup-go/issues/107
+          echo "${GOROOT}/bin" >> $GITHUB_PATH
       - name: Clone source code
         run: |
           git clone -b custom --depth=1 https://github.com/yh793/rt-n56u.git /opt/rt-n56u
