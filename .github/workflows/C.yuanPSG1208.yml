@@ -54,25 +54,18 @@ jobs:
           echo "###########################"
           #
           sudo apt-get update
-          sudo apt update
-          sudo apt install libtool-bin gperf python3-docutils autopoint gettext ccache
-          # https://github.com/actions/setup-go/issues/107
+          sudo apt install unzip libtool-bin curl cmake gperf gawk flex bison nano xxd fakeroot kmod \
+          cpio git python-docutils gettext automake autopoint texinfo build-essential help2man \
+          pkg-config zlib1g-dev libgmp3-dev libmpc-dev libmpfr-dev libncurses5-dev libltdl-dev wget libc-dev-bin
+          sudo timedatectl set-timezone "$TIME_ZONE"
           echo "${GOROOT}/bin" >> $GITHUB_PATH
       - name: Clone source code
-        env:
-          KERNEL: 3.4
         run: |
-          if [ $KERNEL = "4.4" ] ; then
-          git clone --depth=1 https://github.com/MeIsReallyBa/padavan-4.4.git /opt/rt-n56u
-          else
           git clone --depth=1 https://github.com/chongshengB/rt-n56u.git /opt/rt-n56u
-          fi
           cd /opt/rt-n56u/toolchain-mipsel
-          curl -O -L  https://github.com/Yh793/Padavan-build/raw/master/mipsel-linux-uclibc.tar.xz
           mkdir -p toolchain-3.4.x
+          wget https://github.com/hanwckf/padavan-toolchain/releases/download/v1.1/mipsel-linux-uclibc.tar.xz
           tar -xvf mipsel-linux-uclibc.tar.xz -C toolchain-3.4.x
-          #sh dl_toolchain.sh
-          mkdir -p /opt/images/
       - name: adapt project
         run: |
           cd /opt/rt-n56u/trunk/user/adguardhome
