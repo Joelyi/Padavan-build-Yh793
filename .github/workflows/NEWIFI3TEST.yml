@@ -13,11 +13,6 @@ on:
         description: 'json format string of include configs'
         required: true
         default: '{"aria":"n","transmission":"n","vpnsvr":"n","vpncli":"n","vpncmd":"n","openvpn":"n","ss":"n","v2ray":"n","xray":"n","trojan":"n","ssobfs":"n","dnsforwarder":"n","adbyby":"n","adguardhome":"n","smartdns":"y","aliddns":"n","zerotier":"n","frpc":"n","frps":"n","ddnsto":"n","wireguard":"n","aldriver":"n","sqm":"n","mentohust":"n","scutclient":"n","njitclient":"n","minieap":"n","dogcom":"n"}'
-      customization:
-        description: 'Customization JSON'
-        required: true
-        type: string
-        default: '{"lanip":"192.168.2.1","signaccount":"admin","signpassword":"admin","wifi2gssid":"Padavan","wifi2gpsk":"1234567890","wifi5gssid":"Padavan-5G","wifi5gpsk":"1234567890"}'
         
 env:
   REPOSITORY_URL: https://github.com/Yh793/rt-n56u.git
@@ -50,30 +45,7 @@ jobs:
         sudo timedatectl set-timezone "$TZ"
         sudo mkdir -p /workdir
         sudo chown $(id -u):$(id -g) /workdir
-
-    - name: Validate Input JSON
-      run: |
-        jq empty <<< '${{ inputs.customization }}' || { echo "❌ Invalid customization JSON"; exit 1; }
-
-    - name: Export Customization & Plugin Flags
-      run: |
-        export_json() {
-          local JSON=$1
-          local PREFIX=$2
-          echo "$JSON" | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while IFS='=' read -r k v; do
-            echo "${PREFIX}${k^^}=$v" >> $GITHUB_ENV
-          done
-        }
-
-          export_json '${{ inputs.customization }}' ""
-
-    - name: Apply Configurations
-      run: |      
-        chmod +x trunk/custom/scripts/*.sh || true
-        bash trunk/custom/scripts/setip.sh "$LANIP" trunk/user/shared/src/defaults.h trunk/user/www/dict/CN.dict
-        bash trunk/custom/scripts/setaccount.sh "$SIGNACCOUNT" "$SIGNPASSWORD" trunk/user/shared/src/defaults.h
-        bash trunk/custom/scripts/setwifi.sh "$WIFI2GSSID" "$WIFI2GPSK" "$WIFI5GSSID" "$WIFI5GPSK" trunk/user/shared/src/defaults.h
-          
+         
     - name: 拉取源码
       run: |
         df -hT $PWD
