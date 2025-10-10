@@ -55,15 +55,15 @@ jobs:
           echo "###########################"
           #
           sudo apt-get update
-          sudo apt update
-          sudo apt install libtool-bin gperf python3-docutils autopoint gettext ccache
+          sudo apt-get -y install unzip libtool-bin curl cmake gperf gawk flex bison nano xxd fakeroot kmod \
+          cpio git python-docutils gettext automake autopoint texinfo build-essential help2man \
+          pkg-config zlib1g-dev libgmp3-dev libmpc-dev libmpfr-dev libncurses5-dev libltdl-dev wget libc-dev-bin
 
       - name: Clone source code
         run: |
           git clone -b chongshengB --depth=1 https://github.com/Yh793/rt-n56u.git /opt/rt-n56u
           cd /opt/rt-n56u/toolchain-mipsel
-          curl -O -L  https://github.com/TurBoTse/padavan/releases/download/toolchain/mipsel-linux-uclibc.tar.xz
-          #curl -O -L  https://github.com/Yh793/Padavan-build/raw/master/mipsel-linux-uclibc.tar.xz
+          curl -O -L  https://github.com/Yh793/Padavan-build/raw/master/mipsel-linux-uclibc.tar.xz
           mkdir -p toolchain-3.4.x
           tar -xvf mipsel-linux-uclibc.tar.xz -C toolchain-3.4.x
           #sh dl_toolchain.sh
@@ -189,7 +189,6 @@ jobs:
           sudo ./build_firmware_modify $TNAME 0
           sudo mv -f images/*.trx /opt/images/${TNAME}_ChongshengB_${{ steps.current-time.outputs.formattedTime }}.trx
           echo "FNAME=$TNAME" >> $GITHUB_ENV
-          echo "BUILDDONE=success" >> $GITHUB_ENV
           
       - name: Upload packages - push to artifact file
         uses: actions/upload-artifact@main
