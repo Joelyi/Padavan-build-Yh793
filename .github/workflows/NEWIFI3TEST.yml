@@ -38,6 +38,16 @@ jobs:
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
+       echo "###########################"
+        pwd
+        #
+        sudo mv $GITHUB_WORKSPACE/padavan $WORK_PATH
+        cd $WORK_PATH/padavan
+        echo "sudo ls -l"
+        pwd
+        sudo ls -l
+        echo "###########################"
+        #
         sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
         sudo apt-get update
         sudo apt update
@@ -56,20 +66,10 @@ jobs:
         tar -xvf mipsel-linux-uclibc.tar.xz -C toolchain-3.4.x
         mkdir -p /opt/images/
         ln -sf /opt/padavan-3.4 $GITHUB_WORKSPACE/padavan-3.4
-        echo "###########################"
-         pwd
-         #
-         sudo mv padavan /opt/
-         cd /opt/padavan
-         echo "sudo ls -l"
-         pwd
-         sudo ls -l
-         echo "###########################"
-         #
 
     - name: 替换需求文件
       run: |
-        cd /opt/padavan/NEWIFI3/
+        cd $WORK_PATH/padavan/NEWIFI3/
         sh install_Setconfig.sh
           
     - name: 同步编译预设插件
