@@ -57,9 +57,6 @@ jobs:
           vim wget xmlto xxd zlib1g-dev python3-setuptools clang
           sudo add-apt-repository ppa:ubuntu-toolchain-r/test
           sudo add-apt-repository ppa:ubuntu-toolchain-r/ppa
-          sudo apt-get install -y gcc-13
-          sudo apt-get install -y g++-13
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 60 --slave /usr/bin/g++ g++ /usr/bin/g++-13
           sudo timedatectl set-timezone "$TZ"
           sudo mkdir -p /workdir
           sudo chown $USER:$GROUPS /workdir
@@ -70,7 +67,7 @@ jobs:
           git clone -b chongshengB --depth=1 https://github.com/Yh793/rt-n56u.git /opt/rt-n56u
           cp -rf $GITHUB_WORKSPACE/padavan/* opt/padavan/
           cd /opt/rt-n56u/toolchain-mipsel
-          curl -O -L  https://github.com/Yh793/Padavan-build/raw/master/mipsel-linux-uclibc.tar.xz
+          curl -O -L  https://github.com/TurBoTse/padavan/releases/download/toolchain/mipsel-linux-uclibc.tar.xz
           mkdir -p toolchain-3.4.x
           tar -xvf mipsel-linux-uclibc.tar.xz -C toolchain-3.4.x
           #sh dl_toolchain.sh
