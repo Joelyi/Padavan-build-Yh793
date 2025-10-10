@@ -49,7 +49,7 @@ jobs:
     - name: 拉取源码
       run: |
         df -hT $PWD
-        git clone --depth=1 --branch chongshengB $REPOSITORY_URL $WORK_PATH
+        git clone --depth=1 --branch custom $REPOSITORY_URL $WORK_PATH
         cd $WORK_PATH/toolchain-mipsel
         curl -O -L  https://github.com/Yh793/Padavan-build/raw/master/mipsel-linux-uclibc.tar.xz
         mkdir -p toolchain-3.4.x
