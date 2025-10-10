@@ -1,5 +1,5 @@
-#修改TNAME: K2P 中的K2P为你需要编译的型号，注意名称要与configs/templates/目录下的名字相同
-name: C.yuanPSG1208
+#修改TNAME: K2P-5.0 中的K2P-5.0为你需要编译的型号，注意名称要与configs/templates/目录下的名字相同
+name: C.PSG1218
 
 on:
   workflow_dispatch:
@@ -73,6 +73,15 @@ jobs:
           tar -xvf mipsel-linux-uclibc.tar.xz -C toolchain-3.4.x
           #sh dl_toolchain.sh
           mkdir -p /opt/images/
+      - name: adapt project
+        run: |
+          cd /opt/rt-n56u/trunk/user/adguardhome
+          sed -i "s#https://cdn.jsdelivr.net/gh/chongshengB/rt-n56u/trunk/user/adguardhome/AdGuardHome#https://cdn.jsdelivr.net/gh/Yh793/Padavan-build/adg/AdGuardHome#g" ./adguardhome.sh
+          cd /opt/rt-n56u/trunk/tools
+          sed -i '34,40s/^/#/' ./Makefile
+          cd /opt/rt-n56u/trunk/user/rc
+          sed -i '/DNS_RELAY_CACHE_MAX/d' ./services_ex.c
+
       - name: Recovery bin files download from remote
         run: |
           cd /opt/padavan/PSG1208/
@@ -80,10 +89,17 @@ jobs:
           #
           cd /opt/padavan/Theme/
           sh install_Theme.sh
+
+      - name: Get current time
+        uses: josStorer/get-current-time@v2.0.2
+        id: current-time
+        with:
+          format: YY.MMDDHH
+          utcOffset: "+08:00"
+
       - name: Build Firmware
         env:
-          TNAME: PSG1208
-          KERNEL: 3.4
+          TNAME: PSG1208 #PSG1218 K2P-5.0 K2P K2P_nano K2P_nano-5.0 PSG1208 PSG1218_nano
         run: |
           cd /opt/rt-n56u/trunk
           if [ ! -f configs/templates/$TNAME.config ] ; then
@@ -181,9 +197,10 @@ jobs:
           sudo mv -f images/*.trx /opt/images/${TNAME}_ChongshengB_${{ steps.current-time.outputs.formattedTime }}.trx
           echo "FNAME=$TNAME" >> $GITHUB_ENV
           echo "BUILDDONE=success" >> $GITHUB_ENV
-      - name : Upload packages
-        uses: actions/upload-artifact@master
-        if: always()
+          
+      - name: Upload packages - push to artifact file
+        uses: actions/upload-artifact@main
+        if: env.BUILDDONE == 'success'
         with:
-          name: C.yuanPSG1208-Padavan-packages
+          name: C.PSG1218-Padavan-packages
           path: /opt/images
