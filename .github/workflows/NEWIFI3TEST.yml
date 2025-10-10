@@ -13,7 +13,12 @@ on:
         description: 'json format string of include configs'
         required: true
         default: '{"aria":"n","transmission":"n","vpnsvr":"n","vpncli":"n","vpncmd":"n","openvpn":"n","ss":"n","v2ray":"n","xray":"n","trojan":"n","ssobfs":"n","dnsforwarder":"n","adbyby":"n","adguardhome":"n","smartdns":"y","aliddns":"n","zerotier":"n","frpc":"n","frps":"n","ddnsto":"n","wireguard":"n","aldriver":"n","sqm":"n","mentohust":"n","scutclient":"n","njitclient":"n","minieap":"n","dogcom":"n"}'
-
+      customization:
+        description: 'Customization JSON'
+        required: true
+        type: string
+        default: '{"lanip":"192.168.2.1","signaccount":"admin","signpassword":"admin","wifi2gssid":"Padavan","wifi2gpsk":"1234567890","wifi5gssid":"Padavan-5G","wifi5gpsk":"1234567890"}'
+        
 env:
   REPOSITORY_URL: https://github.com/Yh793/rt-n56u.git
   WORK_PATH: /opt/padavan-3.4
@@ -38,16 +43,6 @@ jobs:
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
-       echo "###########################"
-        pwd
-        #
-        sudo mv $GITHUB_WORKSPACE/padavan $WORK_PATH
-        cd $WORK_PATH/padavan
-        echo "sudo ls -l"
-        pwd
-        sudo ls -l
-        echo "###########################"
-        #
         sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
         sudo apt-get update
         sudo apt update
@@ -56,6 +51,29 @@ jobs:
         sudo mkdir -p /workdir
         sudo chown $(id -u):$(id -g) /workdir
 
+    - name: Validate Input JSON
+      run: |
+        jq empty <<< '${{ inputs.customization }}' || { echo "❌ Invalid customization JSON"; exit 1; }
+
+    - name: Export Customization & Plugin Flags
+      run: |
+        export_json() {
+          local JSON=$1
+          local PREFIX=$2
+          echo "$JSON" | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while IFS='=' read -r k v; do
+            echo "${PREFIX}${k^^}=$v" >> $GITHUB_ENV
+          done
+        }
+
+          export_json '${{ inputs.customization }}' ""
+
+    - name: Apply Configurations
+      run: |      
+        chmod +x trunk/custom/scripts/*.sh || true
+        bash trunk/custom/scripts/setip.sh "$LANIP" trunk/user/shared/src/defaults.h trunk/user/www/dict/CN.dict
+        bash trunk/custom/scripts/setaccount.sh "$SIGNACCOUNT" "$SIGNPASSWORD" trunk/user/shared/src/defaults.h
+        bash trunk/custom/scripts/setwifi.sh "$WIFI2GSSID" "$WIFI2GPSK" "$WIFI5GSSID" "$WIFI5GPSK" trunk/user/shared/src/defaults.h
+          
     - name: 拉取源码
       run: |
         df -hT $PWD
@@ -66,11 +84,6 @@ jobs:
         tar -xvf mipsel-linux-uclibc.tar.xz -C toolchain-3.4.x
         mkdir -p /opt/images/
         ln -sf /opt/padavan-3.4 $GITHUB_WORKSPACE/padavan-3.4
-
-    - name: 替换需求文件
-      run: |
-        cd $WORK_PATH/padavan/NEWIFI3/
-        sh install_Setconfig.sh
           
     - name: 同步编译预设插件
       run: | 
