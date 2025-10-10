@@ -52,9 +52,16 @@ jobs:
 
       - name: Clone source code
         run: |
-          df -hT $PWD
+         echo "###########################"
+          pwd
+          #
+          sudo mv padavan /opt/
+          cd /opt/padavan
+          echo "sudo ls -l"
+          pwd
+          sudo ls -l
+          echo "###########################"
           git clone -b chongshengB --depth=1 https://github.com/Yh793/rt-n56u.git /opt/rt-n56u
-          cp -rf $GITHUB_WORKSPACE/* opt/
           cd /opt/rt-n56u/toolchain-mipsel
           curl -O -L  https://github.com/TurBoTse/padavan/releases/download/toolchain/mipsel-linux-uclibc.tar.xz
           mkdir -p toolchain-3.4.x
