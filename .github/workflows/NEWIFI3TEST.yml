@@ -91,7 +91,7 @@ jobs:
     - name: 拉取源码
       run: |
         df -hT $PWD
-        git clone -b chongshengB --depth=1 https://github.com/Yh793/rt-n56u.git $WORK_PATH
+        git clone -b master --depth=1 https://github.com/yuos-bit/Padavan $WORK_PATH
         cd $WORK_PATH/toolchain-mipsel
         sudo sh dl_toolchain.sh
         mkdir -p /opt/images/
