@@ -56,14 +56,17 @@ jobs:
           #
           sudo apt-get update
           sudo apt-get install -y \
-            build-essential bison flex gperf help2man libtool-bin texinfo python3-docutils autopoint gettext ccache \
+            bison flex gperf help2man libtool-bin texinfo python3-docutils autopoint gettext ccache \
             autoconf automake liblzma-dev libltdl-dev liblzo2-dev jq
 
       - name: Clone source code
         run: |
           git clone -b chongshengB --depth=1 https://github.com/Yh793/rt-n56u.git /opt/rt-n56u
           cd /opt/rt-n56u/toolchain-mipsel
-          sh dl_toolchain.sh
+          curl -O -L  https://github.com/Yh793/Padavan-build/raw/master/mipsel-linux-uclibc.tar.xz
+          mkdir -p toolchain-3.4.x
+          tar -xvf mipsel-linux-uclibc.tar.xz -C toolchain-3.4.x
+          #sh dl_toolchain.sh
           mkdir -p /opt/images/
 
       - name: adapt project
