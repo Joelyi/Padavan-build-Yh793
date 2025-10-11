@@ -63,6 +63,7 @@ jobs:
         sh install_wifi.sh
         
     - name: Update & Install feeds
+      run: |
         cd /opt/rt-n56u/trunk/linux-3.4.x
         make defconfig
         
