@@ -62,10 +62,10 @@ jobs:
         cd /opt/padavan/mt7603-4.1.2.1/
         sh install_wifi.sh
         
-    - name: Update & Install feeds
-      run: |
-        cd /opt/rt-n56u/trunk/linux-3.4.x
-        make defconfig
+#    - name: Update & Install feeds
+#      run: |
+#        cd /opt/rt-n56u/trunk/linux-3.4.x
+#        make config
         
     - name: Build Firmware
       env:
