@@ -7,39 +7,15 @@ on:
         type: choice
         description: 'target to compile'
         options:
-        - MI-NANO
-        - MI-MINI
-        - MI-3
-        - MI-3A
-        - MI-3C
-        - MI-3MI
-        - MI-R3G
-        - MI-R3P
-        - MI-R3P-breed
-        - MI-4
-        - MI-R4A
-        - MI-4A-100M
-        - MI-4C
-        - RM2100
-        - R2100
+        - PSG1208
+        - PSG1208s
+        - PSG1218
+        - PSG1218
+        - K2P
         - K2P-USB
-        - CR660x
-        - JCG-Q20
-        - JCG-AC860M
-        - JCG-AC876M
-        - JCG-Y2
-        - DIR-878
-        - DIR-882
-        - MR2600
+        - K2P_nano
         - NEWIFI3
-        - XY-C1
-        - WR1200JS
-        - MSG1500
-        - BELL-A040WQ
-        - ZTE-E8820S
-        - E8820V2
-        - B70
-        - JDC-1
+
       plugins:
         description: 'json format string of include configs'
         required: true
