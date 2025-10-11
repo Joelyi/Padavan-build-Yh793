@@ -55,8 +55,9 @@ jobs:
           echo "###########################"
           #
           sudo apt-get update
-          sudo apt update
-          sudo apt install libtool-bin gperf python3-docutils autopoint gettext ccache
+          sudo apt-get install -y \
+            bison flex gperf help2man libtool-bin texinfo python3-docutils autopoint gettext ccache \
+            autoconf automake liblzma-dev libltdl-dev liblzo2-dev jq
 
       - name: Clone source code
         run: |
