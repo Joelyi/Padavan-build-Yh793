@@ -43,7 +43,7 @@ jobs:
       env:
         KERNEL: 3.4
       run: |
-        git clone -b chongshengB --depth=1 https://github.com/Yh793/rt-n56u.git /opt/rt-n56u
+        git clone --depth=1 https://github.com/lmq8267/padavan-KVR.git /opt/rt-n56u
         cd /opt/rt-n56u/toolchain-mipsel
         sh dl_toolchain.sh
         mkdir -p /opt/images/
@@ -61,9 +61,6 @@ jobs:
         #
         cd /opt/padavan/mt7603-4.1.2.1/
         sh install_wifi.sh
-        #
-        cd /opt/rt-n56u/trunk/linux-3.4.x
-        make config
 
     - name: Build Firmware
       env:
