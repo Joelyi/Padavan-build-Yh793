@@ -61,7 +61,11 @@ jobs:
         #
         cd /opt/padavan/mt7603-4.1.2.1/
         sh install_wifi.sh
-
+        
+    - name: Update & Install feeds
+        cd /opt/rt-n56u/trunk/linux-3.4.x
+        make defconfig
+        
     - name: Build Firmware
       env:
         TNAME: NEWIFI3
