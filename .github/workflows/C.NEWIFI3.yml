@@ -56,7 +56,7 @@ jobs:
           #
           sudo apt-get update
           sudo apt-get install -y \
-            bison flex gperf help2man libtool-bin texinfo python3-docutils autopoint gettext ccache \
+            build-essential bison flex gperf help2man libtool-bin texinfo python3-docutils autopoint gettext ccache \
             autoconf automake liblzma-dev libltdl-dev liblzo2-dev jq
 
       - name: Clone source code
