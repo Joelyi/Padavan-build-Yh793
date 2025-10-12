@@ -54,13 +54,13 @@ jobs:
         sed -i 's/size_tmp="24M"/size_tmp="30M"/g' /opt/rt-n56u/trunk/user/scripts/dev_init.sh
         sed -i 's/mtd_part_size=65536/mtd_part_size=5242880/g' /opt/rt-n56u/trunk/user/scripts/mtd_storage.sh
         
-    - name: Recovery bin files download from remote
-      run: |
-          cd /opt/padavan/PSG1208/
-          sh install_Setconfig.sh
-          #
-          cd /opt/padavan/Theme/
-          sh install_Theme.sh
+#    - name: Recovery bin files download from remote
+#      run: |
+#          cd /opt/padavan/PSG1208/
+#          sh install_Setconfig.sh
+#          #
+#          cd /opt/padavan/Theme/
+#          sh install_Theme.sh
         
     - name: Build Firmware
       env:
@@ -376,7 +376,7 @@ jobs:
         echo "CONFIG_FIRMWARE_INCLUDE_VLMCSD=n" >> .config
 
          ## TTYD
-        echo "CONFIG_FIRMWARE_INCLUDE_TTYD=n" >> .config
+        echo "CONFIG_FIRMWARE_INCLUDE_TTYD=y" >> .config
 
          ## 文件传输工具
         echo "CONFIG_FIRMWARE_INCLUDE_LRZSZ=n" >> .config
