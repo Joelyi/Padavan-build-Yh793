@@ -48,20 +48,6 @@ jobs:
         sh dl_toolchain.sh
         mkdir -p /opt/images/
         
-        ##### 修改内存空间和 storage空间6m
-        sed -i 's/SIZ=0x80000/SIZ=0x500000/g' /opt/rt-n56u/trunk/configs/boards/K2P/kernel-3.4.x-5.0.config
-        sed -i 's/size_etc="6M"/size_etc="5M"/g' /opt/rt-n56u/trunk/user/scripts/dev_init.sh
-        sed -i 's/size_tmp="24M"/size_tmp="30M"/g' /opt/rt-n56u/trunk/user/scripts/dev_init.sh
-        sed -i 's/mtd_part_size=65536/mtd_part_size=5242880/g' /opt/rt-n56u/trunk/user/scripts/mtd_storage.sh
-        
-#    - name: Recovery bin files download from remote
-#      run: |
-#          cd /opt/padavan/PSG1208/
-#          sh install_Setconfig.sh
-#          #
-#          cd /opt/padavan/Theme/
-#          sh install_Theme.sh
-        
     - name: Build Firmware
       env:
         TNAME: PSG1218
@@ -76,6 +62,7 @@ jobs:
         sed -i 's/CONFIG_FIRMWARE_INCLUDE_OPENSSL_EXE=n/CONFIG_FIRMWARE_INCLUDE_OPENSSL_EXE=y/g' .config
         ################################################################################################
         ###  清除默认配置###
+        sed -i '/CONFIG_FIRMWARE_WIFI2_DRIVER=3.0/d' .config
         sed -i '/CONFIG_FIRMWARE_ENABLE_IPV6/d' .config
         sed -i '/CONFIG_FIRMWARE_ENABLE_USB/d' .config
         sed -i '/CONFIG_FIRMWARE_ENABLE_UFSD/d' .config
@@ -176,6 +163,11 @@ jobs:
         #以下选项是定义你需要的功能，（y=集成,n=忽略），重新写入到.config文件
         ######################################################################
         ##系统组件
+        #2.4G 驱动选择
+        ### 2.7 = MT7620 v2.7.2.0
+        ### 3.0 = MT7620 v3.0.4.0
+        echo "CONFIG_FIRMWARE_WIFI2_DRIVER=2.7" >> .config
+        
         #启用 IPv6 支持
         echo "CONFIG_FIRMWARE_ENABLE_IPV6=y" >> .config
         
