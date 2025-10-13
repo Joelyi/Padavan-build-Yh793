@@ -55,7 +55,7 @@ jobs:
         
     - name: Build Firmware
       env:
-        TNAME: PSG1208
+        TNAME: PSG1208s
         KERNEL: 3.4
       run: |
         cd /opt/rt-n56u/trunk
