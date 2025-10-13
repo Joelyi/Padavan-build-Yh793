@@ -48,7 +48,6 @@ jobs:
         sh dl_toolchain.sh
         mkdir -p /opt/images/
 
-        
     - name: Recovery bin files download from remote
       run: |
           cd /opt/padavan/PSG1208/
