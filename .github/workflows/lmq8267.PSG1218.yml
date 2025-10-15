@@ -48,10 +48,10 @@ jobs:
         sh dl_toolchain.sh
         mkdir -p /opt/images/
         
-#    - name: Recovery bin files download from remote
-#      run: |
-#          cd /opt/padavan/PSG1218/
-#          sh install_Setconfig.sh
+    - name: Recovery bin files download from remote
+      run: |
+        cd /opt/padavan/PSG1218/
+        sh install_Setconfig.sh
           
     - name: Build Firmware
       env:
