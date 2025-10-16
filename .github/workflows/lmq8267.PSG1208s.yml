@@ -171,7 +171,7 @@ jobs:
         #2.4G 驱动选择
         ### 2.7 = MT7620 v2.7.2.0
         ### 3.0 = MT7620 v3.0.4.0
-        echo "CONFIG_FIRMWARE_WIFI2_DRIVER=2.7" >> .config
+        echo "CONFIG_FIRMWARE_WIFI2_DRIVER=3.0" >> .config
         
         #启用 IPv6 支持
         echo "CONFIG_FIRMWARE_ENABLE_IPV6=y" >> .config
