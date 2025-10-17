@@ -53,8 +53,8 @@ jobs:
           cd /opt/padavan/PSG1208/
           sh install_Setconfig.sh
           #
-          cd /opt/padavan/Theme/
-          sh install_Theme.sh
+          #cd /opt/padavan/Theme/
+          #sh install_Theme.sh
           
     - name: Build Firmware
       env:
