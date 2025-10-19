@@ -55,6 +55,13 @@ jobs:
           #sed -i "s#https://cdn.jsdelivr.net/gh/Padavan_CI/ssp/v2ray#https://cdn.jsdelivr.net/gh/Yh793/Padavan-build/ssp/v2ray#g" ./defaults.c
           cd /opt/rt-n56u/trunk/user/adguardhome
           sed -i "s#https://cdn.jsdelivr.net/gh/chongshengB/rt-n56u/trunk/user/adguardhome/AdGuardHome#https://cdn.jsdelivr.net/gh/Yh793/Padavan-build/adg/AdGuardHome#g" ./adguardhome.sh
+      - name: Recovery bin files download from remote
+        run: |
+          cd /opt/padavan/NEWIFI3/
+          sh install_Setconfig.sh
+          #
+          cd /opt/padavan/mt7603-4.1.2.1/
+          sh install_wifi.sh
       - name: Get current time
         uses: 1466587594/get-current-time@v2
         id: current-time
