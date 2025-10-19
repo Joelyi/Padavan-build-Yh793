@@ -49,9 +49,6 @@ jobs:
           pkg-config zlib1g-dev libgmp3-dev libmpc-dev libmpfr-dev libncurses5-dev libltdl-dev wget libc-dev-bin \
           bison libtool-bin ccache \
           autoconf liblzma-dev liblzo2-dev jq
-          sudo timedatectl set-timezone "$TZ"
-          sudo mkdir -p /workdir
-          sudo chown $(id -u):$(id -g) /workdir
       - name: Clone source code
         run: |
           git clone -b chongshengB --depth=1 https://github.com/Yh793/rt-n56u.git /opt/rt-n56u
