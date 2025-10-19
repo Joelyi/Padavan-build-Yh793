@@ -47,11 +47,9 @@
 #endif
 
 #if defined(CONFIG_RA_HW_NAT) || defined(CONFIG_RA_HW_NAT_MODULE)
-#include "../net/nat/hw_nat/ra_nat.h"
-#include "../net/nat/hw_nat/frame_engine.h"
+#include "../../../../../net/nat/hw_nat/ra_nat.h"
+#include "../../../../../net/nat/hw_nat/frame_engine.h"
 #endif
-
-#define FOE_MAGIC_WLAN 0x7274
 
 /* TODO */
 #undef RT_CONFIG_IF_OPMODE_ON_AP
@@ -93,20 +91,8 @@ static inline void netdev_priv_set(struct net_device *dev, void *priv)
 #endif
 }
 
-/*
-#define RT_DEBUG_OFF        0
-#define RT_DEBUG_ERROR      1
-#define RT_DEBUG_WARN       2
-#define RT_DEBUG_TRACE      3
-#define RT_DEBUG_INFO       4
-#define RT_DEBUG_LOUD       5
-*/
 
-#ifdef DBG
-ULONG RTDebugLevel = RT_DEBUG_WARN; //RT_DEBUG_WARN//RT_DEBUG_TRACE;//RT_DEBUG_ERROR;//RT_DEBUG_OFF;
-#else
-ULONG RTDebugLevel = RT_DEBUG_OFF;//RT_DEBUG_TRACE;//RT_DEBUG_ERROR;//RT_DEBUG_OFF;
-#endif
+ULONG RTDebugLevel = RT_DEBUG_ERROR;
 ULONG RTDebugFunc = 0;
 
 #ifdef OS_ABL_FUNC_SUPPORT
@@ -1702,10 +1688,8 @@ int RtmpOSNetDevAttach(
 		   function will make kernel panic.
 		 */
 		if (pDevOpHook->get_stats)
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,31)
-			pNetDevOps->ndo_get_stats = pDevOpHook->get_stats;
-#else
-			pNetDev->get_stats = pDevOpHook->get_stats;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,35)
+			pNetDevOps->ndo_get_stats64 = pDevOpHook->get_stats;
 #endif
 
 		/* OS specific flags, here we used to indicate if we are virtual interface */
@@ -2277,18 +2261,16 @@ Return Value:
 Note:
 ========================================================================
 */
-#ifdef MAX_CONTINUOUS_TX_CNT
-INT rx_pkt_to_os = 1;
-#endif
 VOID RtmpOsPktRcvHandle(PNDIS_PACKET pNetPkt)
 {
 	struct sk_buff *pRxPkt = RTPKT_TO_OSPKT(pNetPkt);
 
-#ifdef MAX_CONTINUOUS_TX_CNT
+
+	netif_rx(pRxPkt);
+#ifdef NEW_IXIA_METHOD
 	if (IS_OSEXPECTED_LENGTH(RTPKT_TO_OSPKT(pRxPkt)->len + 18))
 		rx_pkt_to_os++;
 #endif
-	netif_rx(pRxPkt);
 }
 
 
@@ -2380,7 +2362,7 @@ VOID RtmpOsPktNatMagicTag(IN PNDIS_PACKET pNetPkt)
 #if !defined(CONFIG_RA_NAT_NONE)
 #if defined (CONFIG_RA_HW_NAT)  || defined (CONFIG_RA_HW_NAT_MODULE)
 	struct sk_buff *pRxPkt = RTPKT_TO_OSPKT(pNetPkt);
-	FOE_MAGIC_TAG(pRxPkt) = FOE_MAGIC_WLAN;
+	FOE_MAGIC_TAG(pRxPkt) = FOE_MAGIC_EXTIF;
 #endif /* CONFIG_RA_HW_NAT || CONFIG_RA_HW_NAT_MODULE */
 #endif /* CONFIG_RA_NAT_NONE */
 }

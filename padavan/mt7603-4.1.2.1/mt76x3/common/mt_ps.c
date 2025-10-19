@@ -326,9 +326,9 @@ VOID MtHandleRxPsPoll(RTMP_ADAPTER *pAd, UCHAR *pAddr, USHORT wcid, BOOLEAN isAc
 		{
 			IsDequeu = TRUE;
 			DequeuAC = NUM_OF_TX_RING;
-			if (tr_entry->enqCount > 8 /*MAX_TX_PROCESS*/ )
+			if (tr_entry->enqCount > MAX_TX_PROCESS)
 			{
-				DequeuCOUNT = 8 /*MAX_TX_PROCESS*/;
+				DequeuCOUNT = MAX_TX_PROCESS;
 				rtmp_ps_enq(pAd,tr_entry);
 			}
 			else
@@ -360,8 +360,10 @@ VOID PsRetrieveTimeout(RTMP_ADAPTER *pAd, STA_TR_ENTRY *tr_entry)
 
 	MtPsRedirectDisableCheck(pAd, tr_entry->wcid);
 
-	DBGPRINT(RT_DEBUG_INFO, ("%s() Recover ps state(state %d to state %d) [wcid = %d]!!\n",
+/*
+	DBGPRINT(RT_DEBUG_OFF, ("%s() Recover ps state(state %d to state %d) [wcid = %d]!!\n",
 		__func__, ps_state_tmp, tr_entry->ps_state, tr_entry->wcid));
+*/
 }
 
 /*

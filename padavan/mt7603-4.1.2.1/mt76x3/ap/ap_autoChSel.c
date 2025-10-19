@@ -128,30 +128,6 @@ static VOID ChannelInfoReset(
 	return;
 }
 
-#if (defined(CUSTOMER_DCC_FEATURE) || defined(OFFCHANNEL_SCAN_FEATURE))
-VOID ChannelInfoResetNew(
-	IN PRTMP_ADAPTER	pAd)
-{
-	
-	NdisZeroMemory(&pAd->ChannelInfo, sizeof(CHANNELINFO));
-	pAd->ApCfg.current_channel_index = 0;
-	return;
-}
-#endif
-
-#ifdef OFFCHANNEL_SCAN_FEATURE
-VOID OffChanScanCtrlReset(
-	IN PRTMP_ADAPTER	pAd)
-{
-	pAd->ScanCtrl.state = OFFCHANNEL_SCAN_INVALID;
-	pAd->ScanCtrl.CurrentGivenChan_Index = 0;
-	pAd->ScanCtrl.Channel = 0;
-	NdisZeroMemory(&pAd->ScanCtrl.ScanGivenChannel[0], sizeof(UCHAR)*MAX_AWAY_CHANNEL);
-	NdisZeroMemory(&pAd->ScanCtrl.ScanTime[0], sizeof(UCHAR)*MAX_AWAY_CHANNEL);
-
-	return;
-}
-#endif
 
 VOID UpdateChannelInfo(
 	IN PRTMP_ADAPTER pAd,
@@ -189,24 +165,9 @@ VOID UpdateChannelInfo(
 		DBGPRINT(RT_DEBUG_TRACE, ("channel %d busytime %d\n",
 			pAd->ChannelList[ch_index].Channel, pAd->pChannelInfo->chanbusytime[ch_index]));
 #endif
-
-#ifdef OFFCHANNEL_SCAN_FEATURE
-		if (pAd->ScanCtrl.state != OFFCHANNEL_SCAN_INVALID) {
-			pAd->ChannelInfo.chanbusytime[ch_index] = AsicGetCCANavTxTime(pAd);
-			Calculate_NF(pAd);
-			if ((pAd->ScanCtrl.ScanTime[pAd->ScanCtrl.CurrentGivenChan_Index]) != 0) {
-				pAd->ScanCtrl.ScanTimeActualEnd = ktime_get();
-				/* Calculate the channel busy value precision by using actual scan time */
-				pAd->ScanCtrl.ScanTimeActualDiff = ktime_to_ms(ktime_sub(pAd->ScanCtrl.ScanTimeActualEnd, pAd->ScanCtrl.ScanTimeActualStart)) + 1;
-				MTWF_LOG(DBG_CAT_AP, DBG_SUBCAT_ALL, DBG_LVL_WARN, ("time_diff:%d Busytime:%d AvgNF:%d\n",
-					pAd->ScanCtrl.ScanTimeActualDiff, pAd->ChannelInfo.chanbusytime[ch_index],
-					pAd->ChannelInfo.AvgNF[ch_index]));
-			}
-		}
-#endif
 	}
 	else
-		DBGPRINT(RT_DEBUG_ERROR, ("pAd->pChannelInfo equal NULL.\n"));
+		DBGPRINT(RT_DEBUG_TRACE, ("pAd->pChannelInfo equal NULL.\n"));
 
 	return;
 }
@@ -449,7 +410,7 @@ static inline UCHAR SelectClearChannelCCA(
 			}
 		}
 
-		DBGPRINT(RT_DEBUG_ERROR, (" ch%d bssid=%02x:%02x:%02x:%02x:%02x:%02x\n",
+		DBGPRINT(RT_DEBUG_TRACE, (" ch%d bssid=%02x:%02x:%02x:%02x:%02x:%02x\n",
 			pBss->Channel, pBss->Bssid[0], pBss->Bssid[1], pBss->Bssid[2], pBss->Bssid[3], pBss->Bssid[4], pBss->Bssid[5]));
 	}
 			
@@ -976,7 +937,7 @@ VOID BuildAcsScanChList(RTMP_ADAPTER *pAd)
 	}
 	pAd->pChannelInfo->ChannelListNum = ChListNum;
 	for (channel_idx = 0; channel_idx < pAd->pChannelInfo->ChannelListNum; channel_idx++) {
-		DBGPRINT(RT_DEBUG_ERROR, ("[%s] Support channel: PrimCh=%d, CentCh=%d, DFS=%d, skip %d\n",
+		DBGPRINT(RT_DEBUG_TRACE, ("[%s] Support channel: PrimCh=%d, CentCh=%d, DFS=%d, skip %d\n",
 			__FUNCTION__, pAd->pChannelInfo->suppChList[channel_idx].Channel, pAd->pChannelInfo->suppChList[channel_idx].CenChannel,
 			pAd->pChannelInfo->suppChList[channel_idx].DfsReq, pAd->pChannelInfo->suppChList[ChListNum].SkipChannel));
 	}

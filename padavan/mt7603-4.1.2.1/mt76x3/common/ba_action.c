@@ -10,11 +10,11 @@
 #define ORI_BA_SESSION_TIMEOUT	(2000)	/* ms */
 #define REC_BA_SESSION_IDLE_TIMEOUT	(1000)	/* ms */
 
-#define REORDERING_PACKET_TIMEOUT		((80 * OS_HZ)/1000)	/* system ticks -- 100 ms*/
-#define MULTI_CLIENT_REORDERING_PACKET_TIMEOUT		((160 * OS_HZ)/1000)	/* system ticks -- 200 ms*/
-#define MAX_REORDERING_PACKET_TIMEOUT	((2000 * OS_HZ)/1000)	/* system ticks -- 100 ms*/
+#define REORDERING_PACKET_TIMEOUT		((100 * OS_HZ)/1000)	/* system ticks -- 100 ms*/
+#define MULTI_CLIENT_REORDERING_PACKET_TIMEOUT		((200 * OS_HZ)/1000)	/* system ticks -- 200 ms*/
+#define MAX_REORDERING_PACKET_TIMEOUT	((3000 * OS_HZ)/1000)	/* system ticks -- 100 ms*/
 
-#if defined(MAX_CONTINUOUS_TX_CNT)
+#if defined(MAX_CONTINUOUS_TX_CNT) || defined(NEW_IXIA_METHOD)
 #undef MULTI_CLIENT_REORDERING_PACKET_TIMEOUT
 #define MULTI_CLIENT_REORDERING_PACKET_TIMEOUT		((500 * OS_HZ)/1000)	/* system ticks -- 200 ms*/
 #endif
@@ -720,7 +720,7 @@ BA_REC_ENTRY *BATableAllocRecEntry(RTMP_ADAPTER *pAd, USHORT *Idx)
 
 	if (pAd->BATable.numAsRecipient >= (MAX_LEN_OF_BA_REC_TABLE - 1))
 	{
-		DBGPRINT(RT_DEBUG_OFF, ("BA Recipeint Session (%ld) > %d\n", 
+		DBGPRINT(RT_DEBUG_TRACE, ("BA Recipeint Session (%ld) > %d\n", 
 							pAd->BATable.numAsRecipient, (MAX_LEN_OF_BA_REC_TABLE - 1)));
 		goto done;
 	}
@@ -1131,7 +1131,7 @@ VOID BARecSessionIdleTimeout(
 			pAd = pBAEntry->pAdapter;
 			/* flush all pending reordering mpdus */
 			ba_refresh_reordering_mpdus(pAd, pBAEntry); 
-			DBGPRINT(RT_DEBUG_OFF, ("%ld: REC BA session Timeout\n", Now32));
+			DBGPRINT(RT_DEBUG_TRACE, ("%ld: REC BA session Timeout\n", Now32));
 		}
 	}
 }
@@ -1704,10 +1704,9 @@ static VOID ba_enqueue_reordering_packet(
 			/* had been already within reordering list don't indicate */
 			RELEASE_NDIS_PACKET(pAd, pRxBlk->pRxPacket, NDIS_STATUS_SUCCESS);                     
 			ba_mpdu_blk_free(pAd, mpdu_blk);
-#ifdef MAX_CONTINUOUS_TX_CNT
+	#ifdef NEW_IXIA_METHOD
 			pAd->tr_ststic.rx[ALREADY_IN_ORDER]++;
-#endif
-
+	#endif
 		}
 
 		ASSERT((0<= pBAEntry->list.qlen)  && (pBAEntry->list.qlen <= pBAEntry->BAWinSize));
@@ -1821,11 +1820,8 @@ void ba_timeout_monitor(PRTMP_ADAPTER pAd)
 	BOOLEAN need_check = FALSE;
 	static int NeedFallBack=0;
 
-	if ((pAd->MacTab.Size >= 20)
-#ifdef MAX_CONTINUOUS_TX_CNT
-		|| (pAd->ixiaCtrl.iMode == VERIWAVE_MODE)
-#endif
-			) {
+	if ( pAd->MacTab.Size >= 20 )
+	{
 		pAd->BATable.ba_reordering_packet_timeout = MULTI_CLIENT_REORDERING_PACKET_TIMEOUT;
 		NeedFallBack = 0;
 	}
@@ -1899,13 +1895,13 @@ VOID Indicate_AMPDU_Packet(RTMP_ADAPTER *pAd, RX_BLK *pRxBlk, UCHAR wdev_idx)
 		data_len = pRxBlk->DataSize;
 	}
 
-	if (!data_len){
+	if (!data_len) {
 		/* release packet*/
 		/* avoid processing with null paiload packets - QCA61X4A bug */
-		DBGPRINT(RT_DEBUG_OFF, ("AMPDU DataSize = %d, RELEASE_NDIS_PACKET.\n", data_len));
 		RELEASE_NDIS_PACKET(pAd, pRxBlk->pRxPacket, NDIS_STATUS_FAILURE);
 		return;
 	}
+
 
 	if (!RX_BLK_TEST_FLAG(pRxBlk, fRX_AMSDU) &&  (data_len > max_pkt_len))
 	{
@@ -1982,7 +1978,7 @@ VOID Indicate_AMPDU_Packet(RTMP_ADAPTER *pAd, RX_BLK *pRxBlk, UCHAR wdev_idx)
 	/* II. Drop Duplicated Packet*/
 	else if (Sequence == pBAEntry->LastIndSeq)
 	{
-#ifdef MAX_CONTINUOUS_TX_CNT
+#ifdef NEW_IXIA_METHOD
 		pAd->tr_ststic.rx[DUP_SEQ_PKT]++;
 #endif
 		pBAEntry->nDropPacket++;
@@ -1994,7 +1990,7 @@ VOID Indicate_AMPDU_Packet(RTMP_ADAPTER *pAd, RX_BLK *pRxBlk, UCHAR wdev_idx)
 	/* III. Drop Old Received Packet*/
 	else if (SEQ_SMALLER(Sequence, pBAEntry->LastIndSeq, MAXSEQ))
 	{
-#ifdef MAX_CONTINUOUS_TX_CNT
+#ifdef NEW_IXIA_METHOD
 		pAd->tr_ststic.rx[DUP_SEQ_PKT]++;
 #endif
 		pBAEntry->nDropPacket++;

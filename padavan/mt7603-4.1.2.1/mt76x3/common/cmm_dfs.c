@@ -28,8 +28,6 @@
 
 #include "rt_config.h"
 
-#include "phy/rlt_bbp.h"
-
 #ifdef DFS_SUPPORT
 #ifdef CONFIG_AP_SUPPORT
 

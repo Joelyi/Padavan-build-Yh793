@@ -72,7 +72,7 @@ INT wdev_tx_pkts(NDIS_HANDLE dev_hnd, PPNDIS_PACKET pkt_list, UINT pkt_cnt, stru
 		{
 			/* Drop send request since hardware is in reset state */
 			RELEASE_NDIS_PACKET(pAd, pPacket, NDIS_STATUS_FAILURE);
-#ifdef MAX_CONTINUOUS_TX_CNT
+#ifdef NEW_IXIA_METHOD
 			if (IS_EXPECTED_LENGTH(RTPKT_TO_OSPKT(pPacket)->len))
 				pAd->tr_ststic.tx[DROP_HW_RESET]++;
 #endif
@@ -133,7 +133,7 @@ INT wdev_tx_pkts(NDIS_HANDLE dev_hnd, PPNDIS_PACKET pkt_list, UINT pkt_cnt, stru
 	#ifdef TCSUPPORT_MT7510_FE
 	            if (ra_sw_nat_hook_tx(pPacket, NULL, FOE_MAGIC_WLAN) == 0) 			
 	#else
-	            if (ra_sw_nat_hook_tx(pPacket, 1) == 0) // 0->1 2023.10.23
+	            if (ra_sw_nat_hook_tx(pPacket, 1) == 0) 			
 	#endif
 				{
 	                RELEASE_NDIS_PACKET(pAd, pPacket, NDIS_STATUS_FAILURE);
@@ -146,11 +146,7 @@ INT wdev_tx_pkts(NDIS_HANDLE dev_hnd, PPNDIS_PACKET pkt_list, UINT pkt_cnt, stru
 #if !defined(CONFIG_RA_NAT_NONE)
 			if(ra_sw_nat_hook_tx!= NULL)
 			{
-				//unsigned long flags;
-		
-				//RTMP_INT_LOCK(&pAd->page_lock, flags);
-				ra_sw_nat_hook_tx(pPacket,0);
-				//RTMP_INT_UNLOCK(&pAd->page_lock, flags);
+				ra_sw_nat_hook_tx(pPacket, 0);
 			}
 #endif
 #endif /* CONFIG_RAETH */
@@ -189,11 +185,10 @@ INT wdev_tx_pkts(NDIS_HANDLE dev_hnd, PPNDIS_PACKET pkt_list, UINT pkt_cnt, stru
 			}
 		} else {
 			RELEASE_NDIS_PACKET(pAd, pPacket, NDIS_STATUS_FAILURE);
-#ifdef MAX_CONTINUOUS_TX_CNT
+#ifdef NEW_IXIA_METHOD
 			if (IS_EXPECTED_LENGTH(RTPKT_TO_OSPKT(pPacket)->len))
 				pAd->tr_ststic.tx[INVALID_PKT_LEN]++;
 #endif
-
 		}
 	}
 

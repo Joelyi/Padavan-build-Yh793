@@ -1574,15 +1574,15 @@ VOID PeerPairMsg2Action(
 
 		wdev = &pAd->ApCfg.MBSSID[apidx].wdev;
 		pBssid = wdev->bssid;
-#if defined(DOT11_SAE_SUPPORT) || defined(CONFIG_OWE_SUPPORT)
-		if (FALSE
-			|| (pEntry->AuthMode == Ndis802_11AuthModeOWE) || (pEntry->AuthMode == Ndis802_11AuthModeWPA3PSK)
 
-			)
+#if defined(DOT11_SAE_SUPPORT) || defined(CONFIG_OWE_SUPPORT)
+		if ( (pEntry->AuthMode == Ndis802_11AuthModeOWE) || (pEntry->AuthMode == Ndis802_11AuthModeWPA3PSK) )
 			pmk_ptr = pEntry->PMK;
 		else
-#endif
 			pmk_ptr = pAd->ApCfg.MBSSID[apidx].PMK;
+#else
+		pmk_ptr = pAd->ApCfg.MBSSID[apidx].PMK;
+#endif
 		gtk_ptr = pAd->ApCfg.MBSSID[apidx].GTK;
 		group_cipher = wdev->GroupKeyWepStatus;
 		default_key = wdev->DefaultKeyId;
@@ -2118,7 +2118,7 @@ VOID PeerPairMsg3Action(
 			pEntry->CCMP_BC_PN[kid] += ((UINT64)pMsg3->KeyDesc.KeyRsc[idx] << (idx*8));
 		pEntry->AllowUpdateRSC = FALSE;
 		pEntry->Init_CCMP_BC_PN_Passed[kid] = FALSE;
-		DBGPRINT(RT_DEBUG_OFF, ("%s(%d)-%d: update CCMP_BC_PN to %llu\n",
+		DBGPRINT(RT_DEBUG_TRACE, ("%s(%d)-%d: update CCMP_BC_PN to %llu\n",
 			__func__, pEntry->wcid, kid, pEntry->CCMP_BC_PN[kid]));
 	}
 
@@ -2222,13 +2222,6 @@ VOID PeerPairMsg3Action(
 				if (tr_entry->PortSecured == WPA_802_1X_PORT_SECURED) {
 #ifdef MWDS
 					MWDSAPCliPeerEnable(pAd, pApCliEntry, pEntry);
-#endif
-#ifdef MAP_SUPPORT
-					DBGPRINT(RT_DEBUG_TRACE, ("APCLIENT MAP_ENABLE\n"));
-#ifdef A4_CONN
-					map_a4_peer_enable(pAd, pEntry, FALSE);
-#endif
-					map_send_bh_sta_wps_done_event(pAd, pEntry, FALSE);
 #endif
 				}
 			}
@@ -2602,13 +2595,6 @@ VOID PeerPairMsg4Action(
 #ifdef MWDS
 			MWDSAPPeerEnable(pAd, pEntry);
 #endif
-#if defined(MAP_SUPPORT)
-			MTWF_LOG(DBG_CAT_SEC, DBG_SUBCAT_ALL, DBG_LVL_TRACE, ("MAP_ENABLE\n"));
-#if defined(A4_CONN)
-			map_a4_peer_enable(pAd, pEntry, TRUE);
-#endif
-			map_send_bh_sta_wps_done_event(pAd, pEntry, TRUE);
-#endif /* MAP_SUPPORT */
 
 #ifdef WAPP_SUPPORT
 			wapp_send_cli_join_event(pAd, pEntry);
@@ -2626,6 +2612,11 @@ VOID PeerPairMsg4Action(
 		}
 #endif /* WH_EVENT_NOTIFIER */
 
+		#ifdef IAPP_SUPPORT
+			if (IS_ENTRY_CLIENT(pEntry)) {
+			    IAPP_L2_Update_Frame_Send(pAd, pEntry->Addr,pEntry->wdev->wdev_idx);
+			}
+		#endif /* IAPP_SUPPORT */
 			/* send wireless event - for set key done WPA2*/
 				RTMPSendWirelessEvent(pAd, IW_SET_KEY_DONE_WPA2_EVENT_FLAG, pEntry->Addr, pEntry->wdev->wdev_idx, 0);
 
@@ -2661,7 +2652,7 @@ VOID PeerPairMsg4Action(
 		/* update STA bssid & security info to daemon */
 		MboIndicateStaBssidInfo(pAd, &pAd->ApCfg.MBSSID[pEntry->func_tb_idx].wdev, pEntry->Addr);
 #endif/* MBO_SUPPORT */
-	        DBGPRINT(RT_DEBUG_TRACE, ("AP SETKEYS DONE - WPA2, AuthMode(%d)=%s, WepStatus(%d)=%s, GroupWepStatus(%d)=%s\n",
+	        DBGPRINT(RT_DEBUG_TRACE, ("AP SETKEYS DONE - WPA2, AuthMode(%d)=%s, WepStatus(%d)=%s, GroupWepStatus(%d)=%s\n\n",
 									pEntry->AuthMode, GetAuthMode(pEntry->AuthMode),
 									pEntry->WepStatus, GetEncryptType(pEntry->WepStatus),
 									group_cipher,
@@ -2819,8 +2810,6 @@ VOID	PeerGroupMsg1Action(
 	UCHAR CliIdx = 0xFF;
 #endif /* MAC_REPEATER_SUPPORT */
 	STA_TR_ENTRY *tr_entry;
-	PHEADER_802_11 pHeader;
-	unsigned char hdr_len = LENGTH_802_11;
 	UCHAR idx = 0;
 
 	DBGPRINT(RT_DEBUG_TRACE, ("===> PeerGroupMsg1Action \n"));
@@ -2862,14 +2851,9 @@ VOID	PeerGroupMsg1Action(
 	if (pCurrentAddr == NULL)
 		return;
 
-	pHeader = (PHEADER_802_11)Elem->Msg;
-#ifdef A4_CONN
-	if (pHeader->FC.FrDs == 1 && pHeader->FC.ToDs == 1)
-		hdr_len = LENGTH_802_11_WITH_ADDR4;
-#endif
-	/* Process Group Message 1 frame. skip 802.11 header(24/30) & LLC_SNAP header(8)*/
-	pGroup = (PEAPOL_PACKET)&Elem->Msg[hdr_len + LENGTH_802_1_H];
-	MsgLen = Elem->MsgLen - hdr_len - LENGTH_802_1_H;
+	/* Process Group Message 1 frame. skip 802.11 header(24) & LLC_SNAP header(8)*/
+	pGroup = (PEAPOL_PACKET) &Elem->Msg[LENGTH_802_11 + LENGTH_802_1_H];
+	MsgLen = Elem->MsgLen - LENGTH_802_11 - LENGTH_802_1_H;
 
 	/* Sanity Check peer group message 1 - Replay Counter, MIC, RSNIE*/
 	if (PeerWpaMessageSanity(pAd, pGroup, MsgLen, EAPOL_GROUP_MSG_1, pEntry) == FALSE) {
@@ -2902,7 +2886,7 @@ VOID	PeerGroupMsg1Action(
 			pEntry->CCMP_BC_PN[kid] += ((UINT64)pGroup->KeyDesc.KeyRsc[idx] << (idx*8));
 		pEntry->AllowUpdateRSC = FALSE;
 		pEntry->Init_CCMP_BC_PN_Passed[kid] = FALSE;
-		DBGPRINT(RT_DEBUG_OFF, ("%s(%d)-%d: update CCMP_BC_PN to %llu\n",
+		DBGPRINT(RT_DEBUG_TRACE, ("%s(%d)-%d: update CCMP_BC_PN to %llu\n",
 			__func__, pEntry->wcid, kid, pEntry->CCMP_BC_PN[kid]));
 	}
 
@@ -3260,7 +3244,7 @@ VOID PeerGroupMsg2Action(
 			/* send wireless event - for set key done WPA2*/
 				RTMPSendWirelessEvent(pAd, IW_SET_KEY_DONE_WPA2_EVENT_FLAG, pEntry->Addr, pEntry->wdev->wdev_idx, 0);
 
-			DBGPRINT(RT_DEBUG_TRACE, ("AP SETKEYS DONE - WPA2, AuthMode(%d)=%s, WepStatus(%d)=%s, GroupWepStatus(%d)=%s\n",
+			DBGPRINT(RT_DEBUG_TRACE, ("AP SETKEYS DONE - WPA2, AuthMode(%d)=%s, WepStatus(%d)=%s, GroupWepStatus(%d)=%s\n\n",
 										pEntry->AuthMode, GetAuthMode(pEntry->AuthMode),
 										pEntry->WepStatus, GetEncryptType(pEntry->WepStatus),
 										group_cipher, GetEncryptType(group_cipher)));
@@ -3270,7 +3254,7 @@ VOID PeerGroupMsg2Action(
 			/* send wireless event - for set key done WPA*/
 				RTMPSendWirelessEvent(pAd, IW_SET_KEY_DONE_WPA1_EVENT_FLAG, pEntry->Addr, pEntry->wdev->wdev_idx, 0);
 
-        	DBGPRINT(RT_DEBUG_OFF, ("AP SETKEYS DONE - WPA1, AuthMode(%d)=%s, WepStatus(%d)=%s, GroupWepStatus(%d)=%s\n",
+        	DBGPRINT(RT_DEBUG_TRACE, ("AP SETKEYS DONE - WPA1, AuthMode(%d)=%s, WepStatus(%d)=%s, GroupWepStatus(%d)=%s\n\n",
 										pEntry->AuthMode, GetAuthMode(pEntry->AuthMode),
 										pEntry->WepStatus, GetEncryptType(pEntry->WepStatus),
 										group_cipher, GetEncryptType(group_cipher)));
@@ -6947,27 +6931,6 @@ VOID RTMPSetWcidSecurityInfo(
 
 }
 
-
-/*
- * inc_byte_array - Increment arbitrary length byte array by one
- * @counter: Pointer to byte array
- * @len: Length of the counter in bytes
- *
- * This function increments the last byte of the counter by one and continues
- * rolling over to more significant bytes if the byte was incremented from
- * 0xff to 0x00.
- */
-void inc_byte_array(UCHAR *counter, int len)
-{
-	int pos = len - 1;
-
-	while (pos >= 0) {
-		counter[pos]++;
-		if (counter[pos] != 0)
-			break;
-		pos--;
-	}
-}
 
 #ifdef CONFIG_OWE_SUPPORT
 
