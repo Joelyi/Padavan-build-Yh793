@@ -74,6 +74,9 @@ jobs:
           #
           cd /opt/padavan/mt7603-4.1.2.1/
           sh install_wifi.sh
+          #
+          cd /opt/padavan/NEWIFI3-hw_nat/
+          sh install_nat.sh
       - name: Download package
         run: |
           cd //opt/rt-n56u/trunk/linux-3.4.x
