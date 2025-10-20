@@ -53,9 +53,6 @@ jobs:
         sed -i 's/size_etc="6M"/size_etc="18M"/g' /opt/rt-n56u/trunk/user/scripts/dev_init.sh
         sed -i 's/size_tmp="24M"/size_tmp="120M"/g' /opt/rt-n56u/trunk/user/scripts/dev_init.sh
         sed -i 's/mtd_part_size=65536/mtd_part_size=18874368/g' /opt/rt-n56u/trunk/user/scripts/mtd_storage.sh
-
-        ##### 支持V2RAYA
-        sed -i 's///#define EVM_RESTART_V2RAYA/#define EVM_RESTART_V2RAYA/g' /opt/rt-n56u/trunk/user/httpd/common.h
         
     - name: Recovery bin files download from remote
       run: |
