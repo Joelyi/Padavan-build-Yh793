@@ -78,6 +78,7 @@ jobs:
           ################################################################################################
           #因不同型号配置功能不一样，所以先把配置项删除，如果你自己要添加其他的，也要写上删除这一条，切记！！！
           ################################################################################################
+          sed -i '/CONFIG_FIRMWARE_INCLUDE_HTTPS/d' .config
           sed -i '/CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_SERVER/d' .config #删除配置项SOFTETHERVPN
           sed -i '/CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_CLIENT/d' .config #删除配置项SOFTETHERVPN
           sed -i '/CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_CMD/d' .config #删除配置项SOFTETHERVPN        
@@ -107,6 +108,9 @@ jobs:
           ######################################################################
           #以下选项是定义你需要的功能（y=集成,n=忽略），重新写入到.config文件
           ######################################################################        
+          ##包含 HTTPS 支持。openssl 约 1.2MB
+          echo "CONFIG_FIRMWARE_INCLUDE_HTTPS=y" >> .config
+          #
           echo "CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_SERVER=n" >> .config #SOFTETHERVPN
           echo "CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_CLIENT=n" >> .config #SOFTETHERVPN
           echo "CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_CMD=n" >> .config #SOFTETHERVPN
@@ -174,26 +178,6 @@ jobs:
         with:
           name: Padavan-packages
           path: /opt/images
-      #上传到WeTransfer
-      - name: Upload firmware to WeTransfer
-        id: wetransfer
-        if: steps.organize.outputs.status == 'success'
-        run: |
-          curl -fsSL git.io/file-transfer | sh
-          ./transfer wet  -s -p 16 --no-progress /opt/images/*.trx 2>&1 | tee wetransfer.log
-          echo "::warning file=wetransfer.com::$(cat wetransfer.log | grep https)"
-          echo "DOWNLOADURL2=$(cat wetransfer.log | grep -o -E "https?://[a-zA-Z0-9\.\/_&=@$%?~#-]*")" >> $GITHUB_ENV
-          echo "::set-output name=status::success"
-      #上传到奶牛快传
-      - name: Upload firmware to cowtransfer
-        id: cowtransfer
-        if: steps.wetransfer.outputs.status == 'success'
-        run: |
-          curl -sL https://git.io/cowtransfer | sh
-          ./cowtransfer-uploader -s -p 16 --hash /opt/images/*.trx 2>&1 | tee cowtransfer.log
-          echo "::warning file=cowtransfer.com::$(cat cowtransfer.log | grep https)"
-          echo "DOWNLOADURL=$(cat cowtransfer.log | grep -o -E "https?://[a-zA-Z0-9\.\/_&=@$%?~#-]*")" >> $GITHUB_ENV
-          echo "::set-output name=status::success"
       - name: Remove obsolete firmwares on artifacts
         uses: c-hive/gha-remove-artifacts@v1.2.0
         if: always()
