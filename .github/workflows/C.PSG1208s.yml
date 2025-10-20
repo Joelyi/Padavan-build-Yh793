@@ -83,6 +83,9 @@ jobs:
           #
           cd /opt/padavan/Theme/
           sh install_Theme.sh
+          #
+          cd /opt/padavan/adg/
+          sh install_adguardhome.sh
 
       - name: Get current time
         uses: josStorer/get-current-time@v2.0.2
