@@ -460,5 +460,5 @@ jobs:
       uses: actions/upload-artifact@master
       if: always()
       with:
-        name: lmq8267.PSG1218
+        name: lmq8267-PSG1218
         path: /opt/images
