@@ -143,13 +143,13 @@ jobs:
           #2.4G 驱动选择
           ### 2.7 = MT7620 v2.7.2.0
           ### 3.0 = MT7620 v3.0.4.0
-          echo "CONFIG_FIRMWARE_WIFI2_DRIVER=2.7" >> .config
+          echo "CONFIG_FIRMWARE_WIFI2_DRIVER=3.0" >> .config
           #
           ##启用交换文件/分区支持。约 0.05MB
           echo "CONFIG_FIRMWARE_ENABLE_SWAP=y" >> .config
           #
           ##包含 HTTPS 支持。openssl 约 1.2MB
-          echo "CONFIG_FIRMWARE_INCLUDE_HTTPS=n" >> .config
+          echo "CONFIG_FIRMWARE_INCLUDE_HTTPS=y" >> .config
           #
           ## iperf3测速软件
           echo "CONFIG_FIRMWARE_INCLUDE_IPERF3=y" >> .config
