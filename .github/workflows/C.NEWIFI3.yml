@@ -80,6 +80,9 @@ jobs:
           #
           cd /opt/padavan/NEWIFI3/NEWIFI3-hw_nat/
           sh install_nat.sh
+          #
+          cd /opt/padavan/NEWIFI3/NEWIFI3-e2fsprogs/
+          sh install_e2fsprogs.sh
       - name: Download package
         run: |
           cd //opt/rt-n56u/trunk/linux-3.4.x
