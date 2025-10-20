@@ -3,7 +3,7 @@
 DESTDIR=/opt/rt-n56u
 ROOTDIR=`pwd`
 
-default_wifi_path="${DESTDIR}/trunk/linux-3.4.x/drivers/net/wireless/ralink"
+default_wifi_path="${DESTDIR}/trunk/proprietary/rt_wifi/rtpci/4.1.X.X"
 
     echo "--------------开始复制配置文件----------------------"
 sudo rm -rf $default_wifi_path/mt76x3
