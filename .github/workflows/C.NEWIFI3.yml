@@ -81,8 +81,8 @@ jobs:
           cd /opt/padavan/NEWIFI3/NEWIFI3-hw_nat/
           sh install_nat.sh
           #
-          #cd /opt/padavan/NEWIFI3/NEWIFI3-e2fsprogs/
-          #sh install_e2fsprogs.sh
+          cd /opt/padavan/NEWIFI3/NEWIFI3-e2fsprogs/
+          sh install_e2fsprogs.sh
       - name: Download package
         run: |
           cd //opt/rt-n56u/trunk/linux-3.4.x
@@ -113,6 +113,7 @@ jobs:
           ################################################################################################
           #因不同型号配置功能不一样，所以先把配置项删除，如果你自己要添加其他的，也要写上删除这一条，切记！！！
           ################################################################################################
+          sed -i '/CONFIG_FIRMWARE_INCLUDE_HTTPS/d' .config
           sed -i '/CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_SERVER/d' .config #删除配置项SOFTETHERVPN
           sed -i '/CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_CLIENT/d' .config #删除配置项SOFTETHERVPN
           sed -i '/CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_CMD/d' .config #删除配置项SOFTETHERVPN        
@@ -141,7 +142,11 @@ jobs:
           sed -i 's/CONFIG_FIRMWARE_INCLUDE_OPENSSL_EXE=n/CONFIG_FIRMWARE_INCLUDE_OPENSSL_EXE=y/g' .config
           ######################################################################
           #以下选项是定义你需要的功能（y=集成,n=忽略），重新写入到.config文件
-          ######################################################################        
+          ######################################################################    
+          #
+          ##包含 HTTPS 支持。openssl 约 1.2MB
+          echo "CONFIG_FIRMWARE_INCLUDE_HTTPS=y" >> .config
+          #
           echo "CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_SERVER=n" >> .config #SOFTETHERVPN
           echo "CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_CLIENT=n" >> .config #SOFTETHERVPN
           echo "CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_CMD=n" >> .config #SOFTETHERVPN
