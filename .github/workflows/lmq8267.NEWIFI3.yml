@@ -462,5 +462,5 @@ jobs:
       uses: actions/upload-artifact@master
       if: always()
       with:
-        name: NEWIFI3
+        name: lmq8267-NEWIFI3
         path: /opt/images
