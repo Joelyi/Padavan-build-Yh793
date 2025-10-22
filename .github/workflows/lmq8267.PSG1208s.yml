@@ -382,7 +382,7 @@ jobs:
         echo "CONFIG_FIRMWARE_INCLUDE_HTOP=n" >> .config
 
          ## 文本编辑器
-        echo "CONFIG_FIRMWARE_INCLUDE_NANO=y" >> .config
+        echo "CONFIG_FIRMWARE_INCLUDE_NANO=n" >> .config
 
          ## iperf3测速软件
         echo "CONFIG_FIRMWARE_INCLUDE_IPERF3=n" >> .config
