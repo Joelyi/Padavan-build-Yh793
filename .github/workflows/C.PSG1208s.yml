@@ -83,6 +83,9 @@ jobs:
           #
           cd /opt/padavan/Theme/
           sh install_Theme.sh
+          #
+          cd /opt/padavan/K2-wifi/
+          sh install_wifi.sh
 
       - name: Get current time
         uses: josStorer/get-current-time@v2.0.2
