@@ -166,10 +166,11 @@ jobs:
           sudo mv -f images/*.trx /opt/images/${TNAME}_Yh793-ChongshengB_${{ steps.current-time.outputs.formattedTime }}.trx
           cp -f .config /opt/images/${TNAME}.config
           echo "FNAME=$TNAME" >> $GITHUB_ENV
-
+          echo "BUILDDONE=success" >> $GITHUB_ENV
+          
       - name: Upload packages - push to artifact file
         uses: actions/upload-artifact@main
-        if: steps.organize.outputs.status == 'success'
+        if: env.BUILDDONE == 'success'
         with:
           name: C.K2P-5.0-Padavan-packages
           path: /opt/images
