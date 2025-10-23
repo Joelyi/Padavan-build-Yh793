@@ -76,7 +76,7 @@ RTMP_DECLARE_DRV_OPS_FUNCTION(pci);
 #if defined(CONFIG_SECOND_IF_MT7615E) || defined(CONFIG_FIRST_IF_MT7615E) || defined(CONFIG_SECOND_IF_MT7663E)
 #define RTMP_DRV_NAME   "rlt_drv"
 #else
-#define RTMP_DRV_NAME   "mt7603_drv"
+#define RTMP_DRV_NAME   "mt_drv"
 #endif /* CONFIG_SECOND_IF_MT7615E */
 #else
 #define RTMP_DRV_NAME	"rt2860"

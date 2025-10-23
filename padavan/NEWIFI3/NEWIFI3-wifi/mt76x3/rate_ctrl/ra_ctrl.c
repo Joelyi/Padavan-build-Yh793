@@ -291,7 +291,7 @@ UCHAR RateSwitchTableAdapt11BG[] = {
 	 0, 0x00,  0, 40, 101,   0,    1,     1,   1,   1, /* CCK 1M */
 	 1, 0x00,  1, 40,  50,   0,    2,     2,   2,   2, /* CCK 2M */
 	 2, 0x00,  2, 35,  45,   1,    3,     3,   3,   5, /* CCK 5M */
-	 3, 0x00,  3, 20,  45,   2,    4,     4,   4,  11, /* CCK 11M*/
+	 3, 0x00,  2, 20,  35,   2,    4,     4,   4,   9, /* CCK 11M*/
 	 4, 0x10,  2, 20,  35,   3,    5,     5,   5,  12, /* OFDM 12M */
 	 5, 0x10,  3, 16,  35,   4,    6,     6,   6,  18, /* OFDM 18M */
 	 6, 0x10,  4, 10,  25,   5,    7,     7,   7,  24, /* OFDM 24M */
@@ -2315,6 +2315,10 @@ VOID MlmeRAInit(RTMP_ADAPTER *pAd, MAC_TABLE_ENTRY *pEntry)
 	pEntry->LastSecTxRateChangeAction = RATE_NO_CHANGE;
 	pEntry->CurrTxRateIndex = 0;
 	pEntry->TxRateUpPenalty = 0;
+	pEntry->SwiftTrainThrd = 10;
+#if (SWIFT_TRAIN_UP >= 1)
+	ra_swift_train_up_table_reset(pEntry);
+#endif
 
 	MlmeClearAllTxQuality(pEntry);
 }

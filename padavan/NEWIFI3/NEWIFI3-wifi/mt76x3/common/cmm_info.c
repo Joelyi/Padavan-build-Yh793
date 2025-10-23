@@ -25,38 +25,6 @@
  
 #include	"rt_config.h"
 #include "ap.h"
-#ifdef NEW_IXIA_METHOD
-char *tdrop_reason[MAX_TDROP_RESON] = {
-	"NULL",
-	"INVALID_PKT_LEN",
-	"INVALID_TR_WCID",
-	"INVALID_TR_ENTRY",
-	"INVALID_WDEV",
-	"INVALID_ETH_TYPE",
-	"DROP_PORT_SECURE",
-	"DROP_PSQ_FULL",
-	"DROP_TXQ_FULL",
-	"DROP_TX_JAM",
-	"DROP_TXQ_ENQ_FAIL",
-	"DROP_TXQ_ENQ_PS ",
-	"DROP_HW_RESET",
-	"DROP_80211H_MODE",
-	"DROP_BLK_INFO_ERROR",
-};
-char *rdrop_reason[MAX_RDROP_RESON] = {
-	"RPKT_SUCCESS",
-	"ALREADY_IN_ORDER",
-	"DUP_SEQ_PKT",
-	"DROP_OLD_PKT",
-	"DROP_NO_BUF",
-	"DROP_DUP_FRAME",
-	"DROP_NOT_ALLOW",
-	"DROP_RING_FULL",
-	"DROP_DATA_SIZE",
-	"DROP_INFO_NULL",
-	"DROP_RXD_ERROR",
-};
-#endif
 
 #ifdef APCLI_OWE_SUPPORT
 #define OWETRANSIE_LINE_LEN	(10)	/*OWETranIe*/
@@ -623,12 +591,12 @@ INT	Set_Channel_Proc(RTMP_ADAPTER *pAd, RTMP_STRING *arg)
 				if (pAd->Dot11_H.RDMode == RD_SILENCE_MODE)
 				{
 					AsicSwitchChannel(pAd, RFChannel, FALSE);
-#ifdef CONFIG_MAP_SUPPORT
+#ifdef MAP_SUPPORT
 					if (!IS_MAP_ENABLE(pAd) || !pAd->bMAPQuickChChangeEn) {
 #endif
 					APStop(pAd);
 					APStartUp(pAd);
-#ifdef CONFIG_MAP_SUPPORT
+#ifdef MAP_SUPPORT
 					} else {
 for (i = 0; i < WDEV_NUM_MAX; i++) {
 	if (pAd->wdev_list[i] != NULL &&
@@ -650,13 +618,16 @@ ap_phy_rrm_init(pAd);
 			}
 			else
 			{
-#ifdef CONFIG_MAP_SUPPORT
+#ifdef MAP_SUPPORT
 				if (!IS_MAP_ENABLE(pAd) || !pAd->bMAPQuickChChangeEn) {
 #endif
 				AsicSwitchChannel(pAd, RFChannel, FALSE);
 				APStop(pAd);
+#ifdef OFFCHANNEL_SCAN_FEATURE
+				wapp_send_offchan_scan_info_notification(pAd, DRIVER_CHANNEL_SWITCH_SUCCESSFUL);
+#endif
 				APStartUp(pAd);
-#ifdef CONFIG_MAP_SUPPORT
+#ifdef MAP_SUPPORT
 				} else {
 for (i = 0; i < WDEV_NUM_MAX; i++) {
 	if (pAd->wdev_list[i] != NULL && pAd->wdev_list[i]->wdev_type == WDEV_TYPE_AP)
@@ -684,7 +655,7 @@ ap_phy_rrm_init(pAd);
 	return Success;
 }
 
-#ifdef CONFIG_MAP_SUPPORT
+#ifdef MAP_SUPPORT
 /*
 *    ==========================================================================
 *    Description:
@@ -1647,6 +1618,26 @@ INT Set_WscVendorPinCode_Proc(RTMP_ADAPTER *pAd, RTMP_STRING *arg)
 #endif /* WSC_INCLUDED */
 
 
+INT Set_Ap_Probe_Rsp_Times(RTMP_ADAPTER *pAd, RTMP_STRING *arg)
+{
+	POS_COOKIE	pObj = (POS_COOKIE) pAd->OS_Cookie;
+	UCHAR		apidx = pObj->ioctl_if;
+	INT input;
+
+	input = simple_strtol(arg, 0, 10);
+
+	if ((input >= 1) && (input <= 10))
+		pAd->ApCfg.MBSSID[apidx].ProbeRspTimes = input;
+	else{
+		DBGPRINT(RT_DEBUG_ERROR, ("AP[%d]->ProbeRspTimes: Out of Range\n", apidx));
+		return FALSE;
+		}
+	DBGPRINT(RT_DEBUG_TRACE, ("AP[%d]->ProbeRspTimes: %d\n", apidx, pAd->ApCfg.MBSSID[apidx].ProbeRspTimes));
+
+	return TRUE;
+}
+
+
 #ifdef DBG
 INT rx_temp_dbg = 0;
 
@@ -1669,25 +1660,6 @@ INT Set_Debug_Proc(RTMP_ADAPTER *pAd, RTMP_STRING *arg)
 		RTDebugLevel = dbg;
 
 	DBGPRINT_S(("<==%s(RTDebugLevel = %ld)\n", __FUNCTION__, RTDebugLevel));
-
-	return TRUE;
-}
-
-INT Set_Ap_Probe_Rsp_Times(RTMP_ADAPTER *pAd, RTMP_STRING *arg)
-{
-	POS_COOKIE	pObj = (POS_COOKIE) pAd->OS_Cookie;
-	UCHAR		apidx = pObj->ioctl_if;
-	INT input;
-
-	input = simple_strtol(arg, 0, 10);
-
-	if ((input >= 1) && (input <= 10))
-		pAd->ApCfg.MBSSID[apidx].ProbeRspTimes = input;
-	else{
-		DBGPRINT(RT_DEBUG_ERROR, ("AP[%d]->ProbeRspTimes: Out of Range\n", apidx));
-		return FALSE;
-		}
-	DBGPRINT(RT_DEBUG_TRACE, ("AP[%d]->ProbeRspTimes: %d\n", apidx, pAd->ApCfg.MBSSID[apidx].ProbeRspTimes));
 
 	return TRUE;
 }
@@ -2163,33 +2135,6 @@ INT Set_FlagFastDetectStaOff_Proc(RTMP_ADAPTER *pAd, RTMP_STRING *arg)
 }
 #endif
 
-#if defined(MAX_CONTINUOUS_TX_CNT) || defined(NEW_IXIA_METHOD)
-INT	Set_Rssi_Threshold_Proc(RTMP_ADAPTER *pAd, RTMP_STRING *arg)
-{
-	UINT rssithval;
-	rssithval = simple_strtol(arg, 0, 10);
-	pAd->DeltaRssiTh = rssithval;
-	DBGPRINT_S(("==>%s(): pAd->DeltaRssiTh = %d\n", __FUNCTION__, pAd->DeltaRssiTh));
-	return TRUE;
-}
-INT	Set_ContinousTxCnt_Proc(RTMP_ADAPTER *pAd, RTMP_STRING *arg)
-{
-	UINT txcnt;
-	txcnt = simple_strtol(arg, 0, 10);
-	pAd->ContinousTxCnt = txcnt;
-	pAd->MonitorFlag = FALSE;
-	DBGPRINT_S(("==>%s(): pAd->ContinousTxCnt = %d\n", __FUNCTION__, pAd->ContinousTxCnt));
-	return TRUE;
-}
-INT	Set_Rate_Threshold_Proc(RTMP_ADAPTER *pAd, RTMP_STRING *arg)
-{
-	UINT ratethval;
-	ratethval = simple_strtol(arg, 0, 10);
-	pAd->RateTh = ratethval;
-	DBGPRINT_S(("==>%s(): pAd->RateTh = %d\n", __FUNCTION__, pAd->RateTh));
-	return TRUE;
-}
-#endif
 /* 
     ==========================================================================
     Description:
@@ -2770,7 +2715,8 @@ RTMP_STRING *GetAuthMode(CHAR auth)
     ==========================================================================
 */
 #ifndef WH_EZ_SETUP
-#define	LINE_LEN	(4+33+20+23+9+12+7+3)	/* Channel+SSID(2*32+1)+Bssid+Security+Signal+WiressMode+ExtCh+NetworkType*/
+//#define	LINE_LEN	(4+65+20+23+9+7+7+3)	/* Channel+SSID(2*32+1)+Bssid+Security+Signal+WiressMode+ExtCh+NetworkType*/
+#define	LINE_LEN	(4+33+20+23+9+7+7+3)	/* Channel+SSID(2*32+1)+Bssid+Security+Signal+WiressMode+ExtCh+NetworkType*/
 #endif
 
 #ifdef AIRPLAY_SUPPORT
@@ -2795,7 +2741,7 @@ VOID RTMPCommSiteSurveyData(
 	INT         Rssi = 0;
 	UINT        Rssi_Quality = 0;
 	NDIS_802_11_NETWORK_TYPE    wireless_mode;
-	CHAR		Ssid[MAX_LEN_OF_SSID +1];
+	CHAR		Ssid[2*MAX_LEN_OF_SSID + 2];
 	RTMP_STRING SecurityStr[32] = {0};
 	NDIS_802_11_ENCRYPTION_STATUS	ap_cipher = Ndis802_11EncryptionDisabled;
 	NDIS_802_11_AUTHENTICATION_MODE	ap_auth_mode = Ndis802_11AuthModeOpen;
@@ -2820,7 +2766,7 @@ VOID RTMPCommSiteSurveyData(
 #endif /* AIRPLAY_SUPPORT */	
 
 		sprintf(Ssid, "0x");
-		for (idx = 0; (idx < 15) && (idx < pBss->SsidLen); idx++)
+		for (idx = 0; (idx < MAX_LEN_OF_SSID) && (idx < pBss->SsidLen); idx++)
 			sprintf(Ssid + 2 + (idx*2), "%02X", (UCHAR)pBss->Ssid[idx]);
 	}
 	sprintf(msg+strlen(msg), "%-33s", Ssid);
@@ -2956,17 +2902,17 @@ VOID RTMPCommSiteSurveyData(
 		wireless_mode = NetworkTypeInUseSanity(pBss);
 		if (wireless_mode == Ndis802_11FH ||
 			wireless_mode == Ndis802_11DS)
-			sprintf(msg+strlen(msg),"%-12s", "11b");
+			sprintf(msg+strlen(msg),"%-7s", "11b");
 		else if (wireless_mode == Ndis802_11OFDM5)
-			sprintf(msg+strlen(msg),"%-12s", "11a");
+			sprintf(msg+strlen(msg),"%-7s", "11a");
 		else if (wireless_mode == Ndis802_11OFDM5_N)
-			sprintf(msg+strlen(msg),"%-12s", "11a/n");
+			sprintf(msg+strlen(msg),"%-7s", "11a/n");
 		else if (wireless_mode == Ndis802_11OFDM24)
-			sprintf(msg+strlen(msg),"%-12s", "11b/g");
+			sprintf(msg+strlen(msg),"%-7s", "11b/g");
 		else if (wireless_mode == Ndis802_11OFDM24_N)
-			sprintf(msg+strlen(msg),"%-12s", "11b/g/n");
+			sprintf(msg+strlen(msg),"%-7s", "11b/g/n");
 		else
-			sprintf(msg+strlen(msg),"%-12s", "unknow");
+			sprintf(msg+strlen(msg),"%-7s", "unknow");
 
 		/* Ext Channel*/
 		if (pBss->AddHtInfoLen > 0)
@@ -2989,7 +2935,7 @@ VOID RTMPCommSiteSurveyData(
 		else
 			sprintf(msg+strlen(msg),"%-3s", " In");
 		/* SSID Length */
-		//sprintf(msg + strlen(msg), " %-8d", pBss->SsidLen);
+		sprintf(msg + strlen(msg), " %-8d", pBss->SsidLen);
         sprintf(msg+strlen(msg),"\n");
 	
 	return;
@@ -3031,11 +2977,11 @@ VOID RTMPIoctlGetSiteSurvey(
 	UINT32	bss_start_idx;
 	UINT32 TotalLen, BufLen = IW_SCAN_MAX_DATA;
 	INT last_msg_len = 0;
-	BSS_TABLE *pScanTab;
 #ifdef AIRPLAY_SUPPORT
 	UCHAR TargetSsid[MAX_LEN_OF_SSID+1];
 	UCHAR TargetSsidLen = 0;
 #endif /* AIRPLAY_SUPPORT */	
+
 
 #ifdef WSC_INCLUDED
 	max_len += WPS_LINE_LEN;
@@ -3043,7 +2989,9 @@ VOID RTMPIoctlGetSiteSurvey(
 #ifdef MWDS
 	max_len += MWDS_LINE_LEN;
 #endif /* MWDS */
-
+#ifdef DOT11K_RRM_SUPPORT
+	max_len += BCNREPT_LINE_LEN;
+#endif /* DOT11K_RRM_SUPPORT */
 
 #ifdef AIRPLAY_SUPPORT
 		max_len += IS_UNICODE_SSID_LEN;
@@ -3129,25 +3077,25 @@ VOID RTMPIoctlGetSiteSurvey(
 		return;
 	}
 
-	//snprintf(msg, TotalLen, "%s", "\n");
+	snprintf(msg, TotalLen, "%s", "\n");
 	sprintf(msg, "%s", "\n");
-	//sprintf(msg + strlen(msg), "Total=%-4d", pAdapter->ScanTab.BssNr);
-	//sprintf(msg + strlen(msg), "%s", "\n");
+	sprintf(msg + strlen(msg), "Total=%-4d", pAdapter->ScanTab.BssNr);
+	sprintf(msg + strlen(msg), "%s", "\n");
 #ifdef AIRPLAY_SUPPORT
 		sprintf(msg+strlen(msg),"%-4s%-33s%-4s%-20s%-23s%-9s%-7s%-7s%-3s\n",
 			"Ch", "SSID", "UN", "BSSID", "Security", "Siganl(%)", "W-Mode", " ExtCH"," NT");
 #else
-	sprintf(msg + strlen(msg), "%-4s%-33s%-20s%-23s%-9s%-12s%-7s%-3s\n",
-		"Ch", "SSID", "BSSID", "Security", "Signal(%)", "W-Mode", " ExtCH", " NT");
+	sprintf(msg + strlen(msg), "%-4s%-4s%-33s%-20s%-23s%-9s%-7s%-7s%-3s%-8s\n",
+		"No", "Ch", "SSID", "BSSID", "Security", "Siganl(%)", "W-Mode", " ExtCH", " NT", " SSID_Len");
 #endif /* AIRPLAY_SUPPORT */
 
 
 #ifdef WSC_INCLUDED
 	sprintf(msg+strlen(msg)-1,"%-4s%-5s\n", " WPS", " DPID");
 #endif /* WSC_INCLUDED */
-
-
-
+#ifdef DOT11K_RRM_SUPPORT
+	sprintf(msg+strlen(msg)-1, "%-10s\n", " BcnRept");
+#endif /* DOT11K_RRM_SUPPORT */
 #ifdef MWDS
 	sprintf(msg+strlen(msg)-1,"%-8s\n", " MWDSCap");
 #endif /* MWDS */
@@ -3159,9 +3107,6 @@ VOID RTMPIoctlGetSiteSurvey(
 
 	while ((ScanRunning(pAdapter) == TRUE) && (WaitCnt++ < 200))
 		OS_WAIT(500);	
-
-	pScanTab = &pAdapter->ScanTab;
-	BssTableSortByRssi(pScanTab,FALSE);
 
 	for (i = bss_start_idx; i < pAdapter->ScanTab.BssNr; i++)
 	{
@@ -3191,7 +3136,7 @@ VOID RTMPIoctlGetSiteSurvey(
 						continue;
 				}
 #endif /* AIRPLAY_SUPPORT */
-		//sprintf(msg + strlen(msg), "%-4d", i);
+		sprintf(msg + strlen(msg), "%-4d", i);
 		RTMPCommSiteSurveyData(msg, pBss, TotalLen);
 		
 #ifdef WSC_INCLUDED
@@ -3208,7 +3153,9 @@ VOID RTMPIoctlGetSiteSurvey(
 		else
 			sprintf(msg+strlen(msg), "%-5s\n", " ");
 #endif /* WSC_INCLUDED */
-
+#ifdef DOT11K_RRM_SUPPORT
+		sprintf(msg+strlen(msg)-1, "%-7s\n", pBss->FromBcnReport ? " YES" : " NO");
+#endif /* DOT11K_RRM_SUPPORT */
 #ifndef MWDS
 		/*sprintf(msg+strlen(msg), "%-7s\n", pBss->FromBcnReport ? " YES" : " NO");*/
 #else
@@ -3240,75 +3187,14 @@ VOID RTMPIoctlGetSiteSurvey(
 #endif
 
 
-static VOID
-copy_mac_table_entry(RT_802_11_MAC_ENTRY *pDst, MAC_TABLE_ENTRY *pEntry)
-{
-	pDst->ApIdx = (UCHAR)pEntry->func_tb_idx;
-	COPY_MAC_ADDR(pDst->Addr, &pEntry->Addr);
-	pDst->Aid = (UCHAR)pEntry->Aid;
-	pDst->Psm = pEntry->PsMode;
-
-#ifdef DOT11_N_SUPPORT
-	pDst->MimoPs = pEntry->MmpsMode;
-#endif /* DOT11_N_SUPPORT */
-
-	/* Fill in RSSI per entry*/
-	pDst->AvgRssi0 = pEntry->RssiSample.AvgRssi[0];
-	pDst->AvgRssi1 = pEntry->RssiSample.AvgRssi[1];
-	pDst->AvgRssi2 = pEntry->RssiSample.AvgRssi[2];
-
-	/* the connected time per entry*/
-	pDst->ConnectedTime = pEntry->StaConnectTime;
-
-	pDst->TxRate.word = pEntry->HTPhyMode.word;
-	pDst->LastRxRate = pEntry->LastRxRate;
-}
-
-
 VOID RTMPIoctlGetMacTableStaInfo(
 	IN PRTMP_ADAPTER pAd, 
 	IN RTMP_IOCTL_INPUT_STRUCT *wrq)
 {
-	INT i, MacTabWCID;
+	INT i;
 	RT_802_11_MAC_TABLE *pMacTab = NULL;
-	UINT16 wrq_len = wrq->u.data.length;
 	PRT_802_11_MAC_ENTRY pDst;
 	MAC_TABLE_ENTRY *pEntry;
-	POS_COOKIE pObj = (POS_COOKIE)pAd->OS_Cookie;
-
-	wrq->u.data.length = 0;
-#ifdef APCLI_SUPPORT
-	if (pObj->ioctl_if_type == INT_APCLI)
-	{
-		STA_TR_ENTRY *tr_entry;
-		
-		if (wrq_len < sizeof(RT_802_11_MAC_ENTRY))
-			return;
-		if (pObj->ioctl_if >= MAX_APCLI_NUM)
-			return;
-		if (pAd->ApCfg.ApCliTab[pObj->ioctl_if].CtrlCurrState != APCLI_CTRL_CONNECTED)
-			return;
-		MacTabWCID = pAd->ApCfg.ApCliTab[pObj->ioctl_if].MacTabWCID;
-		if (!VALID_WCID(MacTabWCID))
-			return;
-		if (!VALID_TR_WCID(MacTabWCID))
-			return;
-		pEntry = &pAd->MacTab.Content[MacTabWCID];
-		tr_entry = &pAd->MacTab.tr_entry[MacTabWCID];
-		if (IS_ENTRY_APCLI(pEntry) && (pEntry->Sst == SST_ASSOC) && (tr_entry->PortSecured == WPA_802_1X_PORT_SECURED))
-		{
-			RT_802_11_MAC_ENTRY MacEntry;
-			
-			pDst = &MacEntry;
-			copy_mac_table_entry(pDst, pEntry);
-			
-			wrq->u.data.length = sizeof(RT_802_11_MAC_ENTRY);
-			copy_to_user(wrq->u.data.pointer, pDst, wrq->u.data.length);
-		}
-		
-		return;
-	}
-#endif
 
 	/* allocate memory */
 	os_alloc_mem(NULL, (UCHAR **)&pMacTab, sizeof(RT_802_11_MAC_TABLE));
@@ -6333,7 +6219,7 @@ static INT dump_ps_table(RTMP_ADAPTER *pAd, UINT32 ent_type, BOOLEAN bReptCli)
           {
                 printk("AC[%d] Length : %d\n", i, pAd->TxSwQueue[i].Number);
           }
-        printk("\n\n\n");
+        printk("\n");
 #endif /* LIMIT_GLOBAL_SW_QUEUE */
 	
 	printk("\n%-19s\t%-10s\t%-5s\t%-5s\t%-5s\t%-5s\t%-5s\t%-5s\t%-5s\t%-5s\t%-5s\t%-5s\t%-6s\t%-6s\t%-6s",
@@ -6587,7 +6473,7 @@ INT Show_BaTable_Proc(RTMP_ADAPTER *pAd, RTMP_STRING *arg)
 						pAd->MacTab.tr_entry[pEntry->wcid].TxSeq[j]);
 			}
 		}
-		printk("\n\n");
+		printk("\n");
 	}
 
 	return TRUE;
@@ -7522,7 +7408,7 @@ INT32 GetMixModeRssi_Proc(RTMP_ADAPTER *pAd, RTMP_STRING *arg)
 
 	if (MixMode_On(pAd)) {
 		DBGPRINT(RT_DEBUG_ERROR,
-				("\n\n\nQuery::!!!Mix Mode runnning, CANNOT GET RESULT NOW!!!\n\n\n"));
+				("\nQuery::!!!Mix Mode runnning, CANNOT GET RESULT NOW!!!\n"));
 		return FALSE;
 	}
 
@@ -7560,31 +7446,6 @@ INT Show_sta_tr_proc(RTMP_ADAPTER *pAd, RTMP_STRING *arg)
 
 	return TRUE;
 }
-#if defined(MAX_CONTINUOUS_TX_CNT) || defined(NEW_IXIA_METHOD)
-INT Show_TxSwqInfo_Proc(RTMP_ADAPTER *pAd, RTMP_STRING *arg)
-{
-	UCHAR Qindex;
-	
-	Qindex = (UCHAR)simple_strtol(arg, 0, 10);
-	if(Qindex < 0 || Qindex >=4 ){
-		DBGPRINT(RT_DEBUG_OFF, ("Invlaid Qindex,should be 0-3!\n"));
-		return FALSE;
-	}
-	rtmp_tx_swq_dump(pAd,Qindex);
-	DBGPRINT(RT_DEBUG_OFF, ("Dump tx_swq[%d] infor success!\n",Qindex));
-	return TRUE;
-}
-INT Set_TxSwqCtrl_Proc(RTMP_ADAPTER *pAd, RTMP_STRING *arg)
-{
-	UCHAR Ctrl;
-	Ctrl = (UCHAR)simple_strtol(arg, 0, 10);
-	pAd->TxSwqCtrl = Ctrl; 
-	DBGPRINT(RT_DEBUG_OFF, ("1:enq/deq swqidx check.2:deq_req() queue NULL check.3:deq_report() status check.4: drop and ps event statistic.\n"));
-	DBGPRINT(RT_DEBUG_OFF, ("pAd->TxSwqCtrl  = %d!\n",pAd->TxSwqCtrl ));
-	return TRUE;
-}
-
-#endif
 INT show_stainfo_proc(RTMP_ADAPTER *pAd, RTMP_STRING *arg)
 {
 	INT i;
@@ -9655,26 +9516,127 @@ INT32 ShowSCSInfo(RTMP_ADAPTER *pAd, RTMP_STRING *Arg)
 }
 #endif /* SMART_CARRIER_SENSE_SUPPORT */
 
-#ifdef NEW_IXIA_METHOD
-UCHAR force_connect = 0xF;
-INT force_connect_Proc(RTMP_ADAPTER *pAd, RTMP_STRING *arg)
+#ifdef MAX_CONTINUOUS_TX_CNT
+INT	Set_Rssi_Threshold_Proc(RTMP_ADAPTER *pAd, RTMP_STRING *arg)
 {
-	int dbg;
+	UINT rssithval;
 
-	dbg = (int)simple_strtol(arg, 0, 10);
-	force_connect = (UCHAR)dbg;
-	DBGPRINT_S(("<==%s(force_connect = %d)\n", __func__, force_connect));
+	rssithval = simple_strtol(arg, 0, 10);
+	pAd->DeltaRssiTh = rssithval;
+	DBGPRINT_S(("==>%s(): pAd->DeltaRssiTh = %d\n", __func__, pAd->DeltaRssiTh));
+	return TRUE;
+}
+INT	Set_IXIA_TX_MODE_Proc(RTMP_ADAPTER *pAd, RTMP_STRING *arg)
+{
+	UINT Mode;
+
+	Mode = simple_strtol(arg, 0, 10);
+	/*Force max tx cnt*/
+	if (Mode == 1) {
+		pAd->ContinousTxCnt = CONTINUOUS_TX_CNT;
+		pAd->ixiaCtrl.iForceMTO = 0;
+	}
+	/*force Multi-client MAC to One MAC*/
+	if (Mode == 2) {
+		pAd->ContinousTxCnt = 1;
+		pAd->ixiaCtrl.iForceMTO = 1;
+	}
+	DBGPRINT_S(("==>%s(%d): ContinousTxCnt(%d), iForceMTO(%d)\n", __func__, Mode,
+		pAd->ContinousTxCnt, pAd->ixiaCtrl.iForceMTO));
+	return TRUE;
+}
+INT	Set_MinRssi_Threshold_Proc(RTMP_ADAPTER *pAd, RTMP_STRING *arg)
+{
+	CHAR rssithval;
+
+	rssithval = (CHAR)simple_strtol(arg, 0, 10);
+	pAd->MinRssiTh = rssithval;
+	DBGPRINT_S(("==>%s(): pAd->MinRssiTh = %d\n", __func__, pAd->MinRssiTh));
+	return TRUE;
+}
+INT Show_TxSwqInfo_Proc(RTMP_ADAPTER *pAd, RTMP_STRING *arg)
+{
+	UCHAR Qindex = 5;
+	UINT32 mac_val = 0;
+
+	if (arg)
+		Qindex = (UCHAR)simple_strtol(arg, 0, 10);
+	if (Qindex == 5) {
+		DBGPRINT(RT_DEBUG_OFF, ("pAd->TxSwQMaxLen: %d(%d)\n",
+					pAd->TxSwQMaxLen, MAX_PACKETS_IN_QUEUE));
+		DBGPRINT(RT_DEBUG_OFF, ("STAQ(%d), FIFOQ(%d)\n",
+					SQ_ENQ_NORMAL_MAX, TX_SWQ_FIFO_LEN));
+		DBGPRINT(RT_DEBUG_OFF, ("* TX-RingSize = %d   *\n", TX_RING_SIZE));
+		DBGPRINT(RT_DEBUG_OFF, ("* RX-RingSize = %d   *\n", RX_RING_SIZE));
+		DBGPRINT(RT_DEBUG_OFF, ("* MAX_RX_CNT  = %d   *\n", MAX_RX_PROCESS_CNT));
+		DBGPRINT(RT_DEBUG_OFF, ("* MAX_REORDERING_MPDU_NUM	= %d   *\n",
+						MAX_REORDERING_MPDU_NUM));
+		DBGPRINT(RT_DEBUG_OFF, ("* RX_BUFFER_AGGRESIZE	= %d   *\n", RX_BUFFER_AGGRESIZE));
+		DBGPRINT(RT_DEBUG_OFF,
+			("* TxPkts(%d), iMacflag(%d), iRssiflag(%d), iMode(%d), itxCtrl(%d) *\n",
+			pAd->ContinousTxCnt, pAd->ixiaCtrl.iMacflag, pAd->ixiaCtrl.iRssiflag,
+			pAd->ixiaCtrl.iMode, pAd->ixiaCtrl.itxCtrl));
+		DBGPRINT(RT_DEBUG_OFF, ("* MinRssiTh(%d), DeltaRssiTh(%d) *\n",
+					pAd->MinRssiTh, pAd->DeltaRssiTh));
+		DBGPRINT(RT_DEBUG_OFF, ("* iForceMTO(%d)*\n", pAd->ixiaCtrl.iForceMTO));
+		RTMP_IO_READ32(pAd, AGG_AALCR, &mac_val);
+		DBGPRINT(RT_DEBUG_OFF, ("* AGGCR	   = 0x%x *\n", mac_val));
+		RTMP_IO_READ32(pAd, WF_PHY_BASE + 0x0618, &mac_val);
+		DBGPRINT(RT_DEBUG_OFF, ("* EDCCA	   = 0x%x *\n", mac_val));
+		RTMP_IO_READ32(pAd, WF_PHY_BASE + 0x0620, &mac_val);
+		DBGPRINT(RT_DEBUG_OFF, ("* PD		= 0x%x *\n", mac_val));
+		RTMP_IO_READ32(pAd, TMAC_TRCR, &mac_val);
+		DBGPRINT(RT_DEBUG_OFF, ("* I2T		 = 0x%x *\n", mac_val));
+		RTMP_IO_READ32(pAd, AGG_PCR, &mac_val);
+		DBGPRINT(RT_DEBUG_OFF, ("* CTS		 = 0x%x *\n", mac_val));
+		RTMP_IO_READ32(pAd, AGG_PCR1, &mac_val);
+		DBGPRINT(RT_DEBUG_OFF, ("* RTS		 = 0x%x *\n", mac_val));
+		RTMP_IO_READ32(pAd, TMAC_PCR, &mac_val);
+		DBGPRINT(RT_DEBUG_OFF, ("* CTS-CCK	 = 0x%x *\n", mac_val));
+		RTMP_IO_READ32(pAd, CR_AGC_0, &mac_val);
+		DBGPRINT(RT_DEBUG_OFF, ("* VGA(0x%x)	   = 0x%x *\n", CR_AGC_0, mac_val));
+		RTMP_IO_READ32(pAd, CR_AGC_0_RX1, &mac_val);
+		DBGPRINT(RT_DEBUG_OFF, ("* VGA(0x%x)	   = 0x%x *\n", CR_AGC_0_RX1, mac_val));
+		RTMP_IO_READ32(pAd, CR_AGC_3, &mac_val);
+		DBGPRINT(RT_DEBUG_OFF, ("* VGA(0x%x)	   = 0x%x *\n", CR_AGC_3, mac_val));
+		RTMP_IO_READ32(pAd, CR_AGC_3_RX1, &mac_val);
+		DBGPRINT(RT_DEBUG_OFF, ("* VGA(0x%x)	   = 0x%x *\n", CR_AGC_3_RX1, mac_val));
+		DBGPRINT(RT_DEBUG_OFF, ("* detcect length:%d - %d - %d *\n",
+					dectlen_l, dectlen_m, dectlen_h));
+		DBGPRINT(RT_DEBUG_OFF, ("pAd->BATable.ba_reordering_packet_timeout: %d\n",
+			pAd->BATable.ba_reordering_packet_timeout));
+	return TRUE;
+	}
+	if (Qindex < 0 || Qindex >= 4) {
+		DBGPRINT(RT_DEBUG_OFF, ("Invlaid Qindex,should be 0-3!\n"));
+		return FALSE;
+	}
+	rtmp_tx_swq_dump(pAd, Qindex);
+	DBGPRINT(RT_DEBUG_OFF, ("Dump tx_swq[%d] infor success!\n", Qindex));
 	return TRUE;
 }
 
+INT Set_TxSwqCtrl_Proc(RTMP_ADAPTER *pAd, RTMP_STRING *arg)
+{
+	UCHAR Ctrl;
+
+	Ctrl = (UCHAR)simple_strtol(arg, 0, 10);
+	if (Ctrl > 7) {
+		DBGPRINT(RT_DEBUG_OFF, ("Value out of range(%d).\n", Ctrl));
+		return TRUE;
+	}
+	pAd->ixiaCtrl.itxCtrl = Ctrl;
+	DBGPRINT(RT_DEBUG_OFF, ("cmd(%d), ixiatxCtrl(%d).\n", Ctrl, pAd->ixiaCtrl.itxCtrl));
+	return TRUE;
+}
 INT Set_chkT_Proc(RTMP_ADAPTER *pAd, RTMP_STRING *arg)
 {
 	int dbg;
 
 	DBGPRINT_S(("==>%s()\n", __func__));
 	dbg = (int)simple_strtol(arg, 0, 10);
-	pAd->chkTmr = dbg;
-	DBGPRINT_S(("<==%s(pAd->chkTmr = %d)\n", __func__, pAd->chkTmr));
+	pAd->tr_ststic.chkTmr = dbg;
+	DBGPRINT_S(("<==%s(pAd->chkTmr = %d)\n", __func__, pAd->tr_ststic.chkTmr));
 	return TRUE;
 }
 INT Set_pkt_threshld_Proc(RTMP_ADAPTER *pAd, RTMP_STRING *arg)
@@ -9683,7 +9645,7 @@ INT Set_pkt_threshld_Proc(RTMP_ADAPTER *pAd, RTMP_STRING *arg)
 
 	DBGPRINT_S(("==>%s()\n", __func__));
 	dbg = (int)simple_strtol(arg, 0, 10);
-	pAd->pktthld = dbg;
+	pAd->tr_ststic.pktthld = dbg;
 	if (dbg == 0) {
 		dectlen_l = 8;
 		dectlen_m = 8;
@@ -9693,7 +9655,7 @@ INT Set_pkt_threshld_Proc(RTMP_ADAPTER *pAd, RTMP_STRING *arg)
 		dectlen_m = 512;
 		dectlen_h = 1518;
 	}
-	DBGPRINT_S(("<==%s(pAd->pktthld = %d)\n", __func__, pAd->pktthld));
+	DBGPRINT_S(("<==%s(pAd->pktthld = %d)\n", __func__, pAd->tr_ststic.pktthld));
 	return TRUE;
 }
 
@@ -9715,6 +9677,12 @@ INT Set_statistic_pktlen_Proc(RTMP_ADAPTER *pAd, RTMP_STRING *arg)
 	return TRUE;
 }
 
+INT set_cts2self_Threshold_proc(RTMP_ADAPTER *pAd, RTMP_STRING *arg)
+{
+	pAd->Cts2SelfTh = (UINT32)simple_strtol(arg, 0, 10);
+	DBGPRINT_S(("<==%s(pAd->Cts2SelfTh= %d)\n", __func__, pAd->Cts2SelfTh));
+	return TRUE;
+}
 
 INT set_Protection_Parameter_Set_proc(RTMP_ADAPTER *pAd, RTMP_STRING *arg)
 {

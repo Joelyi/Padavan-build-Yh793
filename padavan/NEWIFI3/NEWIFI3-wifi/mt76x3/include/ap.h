@@ -253,6 +253,25 @@ VOID ApSiteSurvey(
 	IN 	struct wifi_dev		*wdev
 );
 
+#ifdef OFFCHANNEL_SCAN_FEATURE
+INT ApSiteSurveyNew_by_wdev(
+	IN	PRTMP_ADAPTER	pAd,
+	IN  UINT 		channel,
+	IN  UINT 		timeout,
+	IN	UCHAR		ScanType,
+	IN	BOOLEAN		ChannelSel,
+	struct wifi_dev 	*wdev);
+INT Channel_Info_MsgHandle(PRTMP_ADAPTER pAd, RTMP_IOCTL_INPUT_STRUCT *wrq, POS_COOKIE pObj);
+VOID Calculate_NF(RTMP_ADAPTER *pAd);
+VOID ResetEnable_NF_Registers(RTMP_ADAPTER *pAd);
+#endif
+
+#if (defined(CUSTOMER_DCC_FEATURE) || defined(OFFCHANNEL_SCAN_FEATURE))
+UCHAR Channel2Index(   
+	IN PRTMP_ADAPTER 	pAd,
+	IN UCHAR 			channel);
+#endif
+
 VOID SupportRate(
 	IN PUCHAR SupRate,
 	IN UCHAR SupRateLen,
@@ -384,10 +403,7 @@ BOOLEAN DOT1X_EapTriggerAction(RTMP_ADAPTER *pAd, MAC_TABLE_ENTRY *pEntry);
 VOID AP_E2PROM_IOCTL_PostCtrl(RTMP_IOCTL_INPUT_STRUCT *wrq, RTMP_STRING *msg);
 
 VOID IAPP_L2_UpdatePostCtrl(RTMP_ADAPTER *pAd, UINT8 *mac, INT wdev_idx);
-BOOLEAN IAPP_L2_Update_Frame_Send(
-	IN PRTMP_ADAPTER	pAd,
-    IN UINT8 *mac_p,
-    IN INT   wdev_idx);
+
 #ifdef AIRPLAY_SUPPORT
 #define AIRPLAY_ON(_pAd)          ((_pAd)->bAirplayEnable == 1)
 #endif /* AIRPLAY_SUPPORT*/
