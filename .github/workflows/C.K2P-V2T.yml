@@ -172,22 +172,10 @@ jobs:
           sudo mv -f images/*.trx /opt/images/${TNAME}_V2T_Yh793-ChongshengB_${{ steps.current-time.outputs.formattedTime }}.trx
           cp -f .config /opt/images/${TNAME}.config
           echo "FNAME=$TNAME" >> $GITHUB_ENV
-      - name: Organize files
-        id: organize
-        run: |
-          echo "###########################"
-          echo "###########################"
-          echo "###########################"
-          echo "::set-output name=status::success"
+
       - name: Upload packages - push to artifact file
         uses: actions/upload-artifact@main
         if: steps.organize.outputs.status == 'success'
         with:
           name: C.K2P-V2T-Padavan-packages
           path: /opt/images
-      - name: Remove obsolete firmwares on artifacts
-        uses: c-hive/gha-remove-artifacts@v1.2.0
-        if: always()
-        with:
-          age: '3 day'
-          skip-recent: 5
