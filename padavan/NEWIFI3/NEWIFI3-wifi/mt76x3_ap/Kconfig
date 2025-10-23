@@ -419,12 +419,6 @@ menu "WiFi Operation Modes"
                 bool "APSTA"
     endchoice
 
-    if MT7603E_WIFI_MODE_AP || MT7603E_WIFI_MODE_BOTH
-        source "drivers/net/wireless/ralink/mt76x3_ap/Kconfig"
-    endif
-
-endmenu
-
 #"RT2860 series"
 config MT7603E_RALINK_RT28XX
         bool
