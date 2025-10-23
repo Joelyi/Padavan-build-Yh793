@@ -58,6 +58,13 @@ jobs:
           tar -xvf mipsel-linux-uclibc.tar.xz -C toolchain-3.4.x
           #sh dl_toolchain.sh
           mkdir -p /opt/images/
+          
+          ##### 修改内存空间和 storage空间18m
+          sed -i 's/0x200000/0x1200000/g' /opt/rt-n56u/trunk/configs/boards/NEWIFI3/kernel-3.4.x.config
+          sed -i 's/size_etc="6M"/size_etc="18M"/g' /opt/rt-n56u/trunk/user/scripts/dev_init.sh
+          sed -i 's/size_tmp="24M"/size_tmp="120M"/g' /opt/rt-n56u/trunk/user/scripts/dev_init.sh
+          sed -i 's/mtd_part_size=65536/mtd_part_size=18874368/g' /opt/rt-n56u/trunk/user/scripts/mtd_storage.sh
+          
       - name: Recovery SSP bin files download from remote
         run: |
           #cp -f ssp/Makefile /opt/rt-n56u/trunk/user/shadowsocks
@@ -83,6 +90,10 @@ jobs:
           #
           cd /opt/padavan/NEWIFI3/NEWIFI3-e2fsprogs/
           sh install_e2fsprogs.sh
+          #
+          cd /opt/padavan/touming-Theme/
+          sh install_Theme.sh
+          
       - name: Download package
         run: |
           cd //opt/rt-n56u/trunk/linux-3.4.x
