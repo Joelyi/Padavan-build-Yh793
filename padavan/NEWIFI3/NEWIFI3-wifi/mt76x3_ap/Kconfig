@@ -1,15 +1,13 @@
-if RT_FIRST_IF_MT7603E || RT_SECOND_IF_MT7603E
-config MT76X3_AP
-	tristate "RLT 7603 WIFI Driver"
-	select MT7603E_WIFI_BASIC_FUNC if MT76X3_AP
-    
-config MT7603E_MT_WIFI_PATH
-        string
-        depends on MT76X3_AP
-        default "rlt_wifi"
+config MT7603E_RLT_AP_SUPPORT
+	tristate "MT7603 802.11n AP support"
+#	depends on NET_RADIO 
+	select MT76X3_AP
+	select WIRELESS_EXT
+	select WEXT_SPY
+	select WEXT_PRIV
 
-if MT76X3_AP
-menu "WiFi Generic Feature Options"
+config MT76X3_AP
+	tristate
 
 if RT_FIRST_IF_MT7603E
 choice
