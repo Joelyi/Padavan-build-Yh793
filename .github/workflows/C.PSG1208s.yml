@@ -127,6 +127,7 @@ jobs:
           sed -i '/CONFIG_FIRMWARE_INCLUDE_ALIDDNS/d' .config #删除配置项阿里DDNS
           sed -i '/CONFIG_FIRMWARE_INCLUDE_SMARTDNS/d' .config
           sed -i '/CONFIG_FIRMWARE_INCLUDE_SRELAY/d' .config
+          sed -i '/CONFIG_FIRMWARE_INCLUDE_OPENSSL_EXE/d' .config
           sed -i '/CONFIG_FIRMWARE_INCLUDE_KUMASOCKS/d' .config
           sed -i '/CONFIG_FIRMWARE_INCLUDE_IPT2SOCKS/d' .config
           sed -i '/CONFIG_FIRMWARE_INCLUDE_MICROSOCKS/d' .config
@@ -149,7 +150,7 @@ jobs:
           echo "CONFIG_FIRMWARE_WIFI2_DRIVER=3.0" >> .config
           #
           ##启用交换文件/分区支持。约 0.05MB
-          echo "CONFIG_FIRMWARE_ENABLE_SWAP=y" >> .config
+          echo "CONFIG_FIRMWARE_ENABLE_SWAP=n" >> .config
           #
           ##包含 HTTPS 支持。openssl 约 1.2MB
           echo "CONFIG_FIRMWARE_INCLUDE_HTTPS=y" >> .config
@@ -159,6 +160,9 @@ jobs:
           #
           ## MTR
           echo "CONFIG_FIRMWARE_INCLUDE_MTR=y" >> .config
+          #
+          ##包含 "openssl" 可执行程序，用于生成证书。约 0.4MB
+          echo "CONFIG_FIRMWARE_INCLUDE_OPENSSL_EXE=n" >> .config
           #
           echo "CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_SERVER=n" >> .config #SOFTETHERVPN
           echo "CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_CLIENT=n" >> .config #SOFTETHERVPN
