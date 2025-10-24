@@ -58,6 +58,12 @@ jobs:
       run: |
         cd /opt/padavan/NEWIFI3/
         sh install_Setconfig.sh
+        #
+        cd /opt/padavan/NEWIFI3/NEWIFI3-wifi/
+        sh install_wifi.sh
+        #
+        cd /opt/padavan/touming-Theme/
+        sh install_Theme.sh
         
     - name: Build Firmware
       env:
@@ -435,7 +441,6 @@ jobs:
         echo "CONFIG_FIRMWARE_INCLUDE_BAFA=y" >> .config #巴法云 约90k
         echo "CONFIG_FIRMWARE_INCLUDE_CADDY=y" >> .config #在线文件管理服务不占空间(4.0kb左右)
         echo "CONFIG_FIRMWARE_INCLUDE_SMARTDNS=y" >> .config #smartdns
-        echo "CONFIG_FIRMWARE_INCLUDE_SMARTDNSBIN=y" >> .config #smartdns二进制文件
         echo "CONFIG_FIRMWARE_INCLUDE_ADGUARDHOME=y" >> .config #adguardhome不占空间(7.2kb左右)
         echo "CONFIG_FIRMWARE_INCLUDE_NETCAT=y" >> .config #nc工具
         echo "CONFIG_FIRMWARE_INCLUDE_MSD_LITE=y" >> .config #MSD_LITE工具
