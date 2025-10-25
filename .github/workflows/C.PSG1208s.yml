@@ -156,16 +156,16 @@ jobs:
           echo "CONFIG_FIRMWARE_ENABLE_SWAP=y" >> .config
           #
           ##包含 HTTPS 支持。openssl 约 1.2MB
-          echo "CONFIG_FIRMWARE_INCLUDE_HTTPS=n" >> .config
+          echo "CONFIG_FIRMWARE_INCLUDE_HTTPS=y" >> .config
           #
           ## iperf3测速软件
-          echo "CONFIG_FIRMWARE_INCLUDE_IPERF3=n" >> .config
+          echo "CONFIG_FIRMWARE_INCLUDE_IPERF3=y" >> .config
           #
           ## MTR
           echo "CONFIG_FIRMWARE_INCLUDE_MTR=y" >> .config
           #
           ##包含 "openssl" 可执行程序，用于生成证书。约 0.4MB
-          echo "CONFIG_FIRMWARE_INCLUDE_OPENSSL_EXE=n" >> .config
+          echo "CONFIG_FIRMWARE_INCLUDE_OPENSSL_EXE=y" >> .config
           #
           echo "CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_SERVER=n" >> .config #SOFTETHERVPN
           echo "CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_CLIENT=n" >> .config #SOFTETHERVPN
