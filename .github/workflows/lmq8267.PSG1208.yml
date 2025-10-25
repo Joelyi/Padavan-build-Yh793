@@ -297,10 +297,10 @@ jobs:
         echo "CONFIG_FIRMWARE_INCLUDE_SSWAN=n" >> .config
 
         ##为 openssl 库添加椭圆曲线（EC）支持。约 0.1MB
-        echo "CONFIG_FIRMWARE_INCLUDE_OPENSSL_EC=y" >> .config
+        echo "CONFIG_FIRMWARE_INCLUDE_OPENSSL_EC=y" >> .configy
 
         ##包含 "openssl" 可执行程序，用于生成证书。约 0.4MB
-        echo "CONFIG_FIRMWARE_INCLUDE_OPENSSL_EXE=n" >> .config
+        echo "CONFIG_FIRMWARE_INCLUDE_OPENSSL_EXE=y" >> .config
 
         ##包含 xUPNPd IPTV 媒体服务器。约 0.3MB
         echo "CONFIG_FIRMWARE_INCLUDE_XUPNPD=n" >> .config
