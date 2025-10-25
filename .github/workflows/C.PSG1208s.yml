@@ -86,6 +86,9 @@ jobs:
           #
           cd /opt/padavan/K2-wifi/
           sh install_wifi.sh
+          #
+          cd /opt/padavan/tihuan-libssl/
+          sh install_libssl.sh
 
       - name: Get current time
         uses: josStorer/get-current-time@v2.0.2
