@@ -81,14 +81,14 @@ jobs:
           cd /opt/padavan/PSG1208s/
           sh install_Setconfig.sh
           #
-          cd /opt/padavan/Theme/
+          cd /opt/padavan/touming-Theme/
           sh install_Theme.sh
           #
           cd /opt/padavan/K2-wifi/
           sh install_wifi.sh
           #
-          cd /opt/padavan/tihuan-lib/
-          sh install_lib.sh
+          #cd /opt/padavan/tihuan-lib/
+          #sh install_lib.sh
 
       - name: Get current time
         uses: josStorer/get-current-time@v2.0.2
