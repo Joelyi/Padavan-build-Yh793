@@ -52,6 +52,9 @@ jobs:
       run: |
           cd /opt/padavan/PSG1208/
           sh install_Setconfig.sh
+          #
+          cd /opt/padavan/touming-Theme/
+          sh install_Theme.sh
           
     - name: Build Firmware
       env:
@@ -279,7 +282,7 @@ jobs:
         echo "CONFIG_FIRMWARE_INCLUDE_DDNS_SSL=n" >> .config
 
         ##包含 HTTPS 支持。openssl 约 1.2MB
-        echo "CONFIG_FIRMWARE_INCLUDE_HTTPS=y" >> .confign
+        echo "CONFIG_FIRMWARE_INCLUDE_HTTPS=n" >> .confign
 
         ##包含 sftp 服务器。openssl 约 1.2MB，sftp-server 约 0.06MB
         echo "CONFIG_FIRMWARE_INCLUDE_SFTP=y" >> .config
@@ -382,7 +385,7 @@ jobs:
         echo "CONFIG_FIRMWARE_INCLUDE_HTOP=n" >> .config
 
          ## 文本编辑器
-        echo "CONFIG_FIRMWARE_INCLUDE_NANO=y" >> .config
+        echo "CONFIG_FIRMWARE_INCLUDE_NANO=n" >> .config
 
          ## iperf3测速软件
         echo "CONFIG_FIRMWARE_INCLUDE_IPERF3=y" >> .config
