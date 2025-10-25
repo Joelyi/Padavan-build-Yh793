@@ -109,10 +109,6 @@ jobs:
           #因不同型号配置功能不一样，所以先把配置项删除，如果你自己要添加其他的，也要写上删除这一条，切记！！！
           ################################################################################################
           sed -i '/CONFIG_FIRMWARE_WIFI2_DRIVER=3.0/d' .config
-          sed -i '/CONFIG_FIRMWARE_ENABLE_SWAP/d' .config
-          sed -i '/CONFIG_FIRMWARE_INCLUDE_HTTPS/d' .config
-          sed -i '/CONFIG_FIRMWARE_INCLUDE_IPERF3/d' .config
-          sed -i '/CONFIG_FIRMWARE_INCLUDE_MTR/d' .config
           sed -i '/CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_SERVER/d' .config #删除配置项SOFTETHERVPN
           sed -i '/CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_CLIENT/d' .config #删除配置项SOFTETHERVPN
           sed -i '/CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_CMD/d' .config #删除配置项SOFTETHERVPN
@@ -127,6 +123,7 @@ jobs:
           sed -i '/CONFIG_FIRMWARE_INCLUDE_ALIDDNS/d' .config #删除配置项阿里DDNS
           sed -i '/CONFIG_FIRMWARE_INCLUDE_SMARTDNS/d' .config
           sed -i '/CONFIG_FIRMWARE_INCLUDE_SRELAY/d' .config
+          sed -i '/CONFIG_FIRMWARE_INCLUDE_OPENSSL_EXE/d' .config
           sed -i '/CONFIG_FIRMWARE_INCLUDE_KUMASOCKS/d' .config
           sed -i '/CONFIG_FIRMWARE_INCLUDE_IPT2SOCKS/d' .config
           sed -i '/CONFIG_FIRMWARE_INCLUDE_MICROSOCKS/d' .config
