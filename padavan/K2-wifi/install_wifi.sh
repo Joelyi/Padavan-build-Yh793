@@ -14,6 +14,6 @@ sudo rm -rf $default_path/rtsoc\2.7.X.X/rt2860v2
 sudo rm -rf $default_path/rtsoc\2.7.X.X/rt2860v2_ap
 sudo rm -rf $default_path/rtsoc\2.7.X.X/rt2860v2_sta
 cp -rf ${ROOTDIR}/rtpci/3.0.X.X/mt76x2_ap ${DESTDIR}/trunk/linux-3.4.x/drivers/net/wireless/ralink
-cp -rf ${ROOTDIR}/rtpci/3.0.X.X/rt2860v2_ap ${DESTDIR}/trunk/linux-3.4.x/drivers/net/wireless/ralink
+cp -rf ${ROOTDIR}/rtsoc/2.7.X.X/rt2860v2_ap ${DESTDIR}/trunk/linux-3.4.x/drivers/net/wireless/ralink
 cp -rf ${ROOTDIR}/. $default_path
 	      echo "--------------复制配置文件结束------------------"
