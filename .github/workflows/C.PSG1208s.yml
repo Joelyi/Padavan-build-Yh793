@@ -86,9 +86,6 @@ jobs:
           #
           cd /opt/padavan/K2-wifi/
           sh install_wifi.sh
-          #
-          #cd /opt/padavan/tihuan-lib/
-          #sh install_lib.sh
 
       - name: Get current time
         uses: josStorer/get-current-time@v2.0.2
@@ -156,13 +153,13 @@ jobs:
           echo "CONFIG_FIRMWARE_ENABLE_SWAP=y" >> .config
           #
           ##包含 HTTPS 支持。openssl 约 1.2MB
-          echo "CONFIG_FIRMWARE_INCLUDE_HTTPS=n" >> .config
+          echo "CONFIG_FIRMWARE_INCLUDE_HTTPS=y" >> .config
           #
           ## iperf3测速软件
-          echo "CONFIG_FIRMWARE_INCLUDE_IPERF3=n" >> .config
+          echo "CONFIG_FIRMWARE_INCLUDE_IPERF3=y" >> .config
           #
           ## MTR
-          echo "CONFIG_FIRMWARE_INCLUDE_MTR=n" >> .config
+          echo "CONFIG_FIRMWARE_INCLUDE_MTR=y" >> .config
           #
           ##包含 "openssl" 可执行程序，用于生成证书。约 0.4MB
           echo "CONFIG_FIRMWARE_INCLUDE_OPENSSL_EXE=n" >> .config
@@ -192,7 +189,7 @@ jobs:
           echo "CONFIG_FIRMWARE_INCLUDE_ADBYBY=n" >> .config #adbyby plus+
           echo "CONFIG_FIRMWARE_INCLUDE_KOOLPROXY=n" >> .config #KP广告过滤
           #
-          echo "CONFIG_FIRMWARE_INCLUDE_SMARTDNS=n" >> .config #smartdns
+          echo "CONFIG_FIRMWARE_INCLUDE_SMARTDNS=y" >> .config #smartdns
           echo "CONFIG_FIRMWARE_INCLUDE_SMARTDNSBIN=n" >> .config #smartdns二进制文件
           echo "CONFIG_FIRMWARE_INCLUDE_ADGUARDHOME=n" >> .config
           #
