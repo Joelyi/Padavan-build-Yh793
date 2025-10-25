@@ -52,6 +52,9 @@ jobs:
       run: |
         cd /opt/padavan/PSG1218/
         sh install_Setconfig.sh
+        #
+        cd /opt/padavan/touming-Theme/
+        sh install_Theme.sh
           
     - name: Build Firmware
       env:
@@ -382,7 +385,7 @@ jobs:
         echo "CONFIG_FIRMWARE_INCLUDE_HTOP=n" >> .config
 
          ## 文本编辑器
-        echo "CONFIG_FIRMWARE_INCLUDE_NANO=y" >> .config
+        echo "CONFIG_FIRMWARE_INCLUDE_NANO=n" >> .config
 
          ## iperf3测速软件
         echo "CONFIG_FIRMWARE_INCLUDE_IPERF3=y" >> .config
