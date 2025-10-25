@@ -159,7 +159,7 @@ jobs:
           echo "CONFIG_FIRMWARE_INCLUDE_HTTPS=n" >> .config
           #
           ## iperf3测速软件
-          echo "CONFIG_FIRMWARE_INCLUDE_IPERF3=y" >> .config
+          echo "CONFIG_FIRMWARE_INCLUDE_IPERF3=n" >> .config
           #
           ## MTR
           echo "CONFIG_FIRMWARE_INCLUDE_MTR=y" >> .config
