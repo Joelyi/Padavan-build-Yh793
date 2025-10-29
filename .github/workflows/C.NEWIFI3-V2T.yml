@@ -1,6 +1,5 @@
 #修改TNAME: K2P-5.0 中的K2P-5.0为你需要编译的型号，注意名称要与configs/templates/目录下的名字相同
-name: C.NEWIFI3-V2T
-
+name: C.NEWIFI3-V2
 on:
   workflow_dispatch:
     inputs:
@@ -215,5 +214,5 @@ jobs:
         uses: actions/upload-artifact@main
         if: env.BUILDDONE == 'success'
         with:
-          name: C.NEWIFI3-Padavan-packages
+          name: C.NEWIFI3--V2T-Padavan-packages
           path: /opt/images
