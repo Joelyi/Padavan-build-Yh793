@@ -72,6 +72,9 @@ jobs:
           sed -i "s#$(SRC_NAME).tgz#$(SRC_NAME).tar.gz#g" ./Makefile
       - name: Recovery bin files download from remote
         run: |
+          cd /opt/padavan/NEWIFI3/
+          sh install_Setconfig.sh
+          #
           cd /opt/padavan/NEWIFI3/NEWIFI3-wifi/
           sh install_wifi.sh
       - name: Get current time
