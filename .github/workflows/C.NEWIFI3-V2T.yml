@@ -68,8 +68,6 @@ jobs:
           #sed -i "s#https://cdn.jsdelivr.net/gh/Padavan_CI/ssp/v2ray#https://cdn.jsdelivr.net/gh/Yh793/Padavan-build/ssp/v2ray#g" ./defaults.c
           cd /opt/rt-n56u/trunk/user/adguardhome
           sed -i "s#https://cdn.jsdelivr.net/gh/chongshengB/rt-n56u/trunk/user/adguardhome/AdGuardHome#https://cdn.jsdelivr.net/gh/Yh793/Padavan-build/adg/AdGuardHome#g" ./adguardhome.sh
-          cd /opt/rt-n56u/trunk/libs/libiconv
-          sed -i "s#$(SRC_NAME).tgz#$(SRC_NAME).tar.gz#g" ./Makefile
       - name: Recovery bin files download from remote
         run: |
           cd /opt/padavan/NEWIFI3/
