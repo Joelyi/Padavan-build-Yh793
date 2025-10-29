@@ -59,6 +59,9 @@ jobs:
         cd /opt/padavan/NEWIFI3/
         sh install_Setconfig.sh
         #
+        cd /opt/padavan/NEWIFI3/httpd/
+        sh install_common.sh
+        #
         cd /opt/padavan/NEWIFI3/NEWIFI3-wifi/
         sh install_wifi.sh
         #
