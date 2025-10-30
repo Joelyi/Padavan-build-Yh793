@@ -123,7 +123,6 @@ jobs:
           sed -i '/CONFIG_FIRMWARE_INCLUDE_ALIDDNS/d' .config #删除配置项阿里DDNS
           sed -i '/CONFIG_FIRMWARE_INCLUDE_SMARTDNS/d' .config
           sed -i '/CONFIG_FIRMWARE_INCLUDE_SRELAY/d' .config
-          sed -i '/CONFIG_FIRMWARE_INCLUDE_OPENSSL_EXE/d' .config
           sed -i '/CONFIG_FIRMWARE_INCLUDE_KUMASOCKS/d' .config
           sed -i '/CONFIG_FIRMWARE_INCLUDE_IPT2SOCKS/d' .config
           sed -i '/CONFIG_FIRMWARE_INCLUDE_MICROSOCKS/d' .config
