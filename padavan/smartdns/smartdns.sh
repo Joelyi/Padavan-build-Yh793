@@ -1,45 +1,59 @@
 #!/bin/sh
-# Copyright (C) 2018 Nick Peng (pymumu@gmail.com)
-# Copyright (C) 2019 chongshengB
-SMARTDNS_CONF_DIR="/etc/storage"
-SMARTDNS_CONF="$SMARTDNS_CONF_DIR/smartdns.conf"
-ADDRESS_CONF="$SMARTDNS_CONF_DIR/smartdns_address.conf"
-BLACKLIST_IP_CONF="$SMARTDNS_CONF_DIR/smartdns_blacklist-ip.conf"
-WHITELIST_IP_CONF="$SMARTDNS_CONF_DIR/smartdns_whitelist-ip.conf"
-CUSTOM_CONF="$SMARTDNS_CONF_DIR/smartdns_custom.conf"
-smartdns_file="/usr/bin/smartdns"
-sdns_enable=`nvram get sdns_enable`
-snds_name=`nvram get snds_name`
-sdns_port=`nvram get sdns_port`
-sdns_tcp_server=`nvram get sdns_tcp_server`
-sdns_ipv6_server=`nvram get sdns_ipv6_server`
-snds_ip_change=`nvram get snds_ip_change`
-snds_ipv6=`nvram get snds_ipv6`
-sdns_www=`nvram get sdns_www`
-sdns_exp=`nvram get sdns_exp`
-snds_redirect=`nvram get snds_redirect`
-snds_cache=`nvram get snds_cache`
-sdns_ttl=`nvram get sdns_ttl`
-sdns_ttl_min=`nvram get sdns_ttl_min`
-sdns_ttl_max=`nvram get sdns_ttl_max`
-sdnse_enable=`nvram get sdnse_enable`
-sdnse_port=`nvram get sdnse_port`
-sdnse_tcp=`nvram get sdnse_tcp`
-sdnse_speed=`nvram get sdnse_speed`
-sdnse_name=`nvram get sdnse_name`
-sdnse_address=`nvram get sdnse_address`
-sdnse_ns=`nvram get sdnse_ns`
-sdnse_ipset=`nvram get sdnse_ipset`
-sdnse_as=`nvram get sdnse_as`
-sdnse_ipc=`nvram get sdnse_ipc`
-sdnse_cache=`nvram get sdnse_cache`
-ss_white=`nvram get ss_white`
-ss_black=`nvram get ss_black`
 
+action="$1"
+storage_Path="/etc/storage"
+smartdns_Bin="/usr/bin/smartdns"
+smartdns_Ini="$storage_Path/smartdns_conf.ini"
+smartdns_Conf="$storage_Path/smartdns.conf"
+smartdns_tmp_Conf="$storage_Path/smartdns_tmp.conf"
+smartdns_address_Conf="$storage_Path/smartdns_address.conf"
+smartdns_blacklist_Conf="$storage_Path/smartdns_blacklist-ip.conf"
+smartdns_whitelist_Conf="$storage_Path/smartdns_whitelist-ip.conf"
+smartdns_custom_Conf="$storage_Path/smartdns_custom.conf"
+dnsmasq_Conf="$storage_Path/dnsmasq/dnsmasq.conf"
+chn_Route="$storage_Path/chinadns/chnroute.txt"
+
+sdns_enable=$(nvram get sdns_enable)
+snds_name=$(nvram get snds_name)
+sdns_port=$(nvram get sdns_port)
+sdns_tcp_server=$(nvram get sdns_tcp_server)
+sdns_ipv6_server=$(nvram get sdns_ipv6_server)
+snds_ip_change=$(nvram get snds_ip_change)
+sdns_ipv6=$(nvram get sdns_ipv6)
+sdns_www=$(nvram get sdns_www)
+sdns_exp=$(nvram get sdns_exp)
+snds_redirect=$(nvram get snds_redirect)
+sdns_cache_persist=$(nvram get sdns_cache_persist)
+snds_cache=$(nvram get snds_cache)
+sdns_ttl=$(nvram get sdns_ttl)
+sdns_ttl_min=$(nvram get sdns_ttl_min)
+sdns_ttl_max=$(nvram get sdns_ttl_max)
+sdnse_enable=$(nvram get sdnse_enable)
+sdnse_port=$(nvram get sdnse_port)
+sdnse_tcp=$(nvram get sdnse_tcp)
+sdnse_speed=$(nvram get sdnse_speed)
+sdns_speed=$(nvram get sdns_speed)
+sdnse_name=$(nvram get sdnse_name)
+sdnse_address=$(nvram get sdnse_address)
+sdns_address=$(nvram get sdns_address)
+sdnse_ns=$(nvram get sdnse_ns)
+sdns_ns=$(nvram get sdns_ns)
+sdnse_ipset=$(nvram get sdnse_ipset)
+sdns_ipset=$(nvram get sdns_ipset)
+sdnse_as=$(nvram get sdnse_as)
+sdns_as=$(nvram get sdns_as)
+sdnse_ipc=$(nvram get sdnse_ipc)
+sdnse_cache=$(nvram get sdnse_cache)
+ss_white=$(nvram get ss_white)
+ss_black=$(nvram get ss_black)
+sdns_coredump=$(nvram get sdns_coredump)
+
+adbyby_process=$(pidof adbyby | awk '{ print $1 }')
 smartdns_process=$(pidof smartdns | awk '{ print $1 }')
 IPS4="$(ifconfig br0 | grep "inet addr" | grep -v ":127" | grep "Bcast" | awk '{print $2}' | awk -F : '{print $2}')"
 IPS6="$(ifconfig br0 | grep "inet6 addr" | grep -v "fe80::" | grep -v "::1" | grep "Global" | awk '{print $3}')"
 dnsmasq_md5=$(md5sum  "$dnsmasq_Conf" | awk '{ print $1 }')
+
 
 # 函数
 
@@ -295,6 +309,7 @@ Check_ip_addr () {
     return 0
 }
 
+
 Change_dnsmasq () {
     # 删除 dnsmasq 配置文件中的相关项，避免重复
     case $action in
@@ -376,7 +391,6 @@ Start_smartdns () {
     [ "$sdns_enable" -eq 0 ] && nvram set sdns_enable=1 && sdns_enable=1
     [ $(pidof smartdns | awk '{ print $1 }')x != x ] && killall -9 smartdns >/dev/null 2>&1
     Change_dnsmasq
-    Change_adbyby
     echo "$hosts_type" >> "$smartdns_Ini"
     [ "$snds_redirect" = 0 ] && logger -t "SmartDNS" "SmartDNS 使用 $sdns_port 端口"
     Change_iptable
@@ -442,6 +456,7 @@ Stop_smartdns () {
     # 【】
     killall -9 smartdns >/dev/null 2>&1
     logger -t "SmartDNS" "结束smartdns进程 ．．．"
+    Change_adbyby
     Change_dnsmasq
     Change_iptable
     if [ "$dnsmasq_md5" != $(md5sum  "$dnsmasq_Conf" | awk '{ print $1 }') ] && [ "$sdns_enable" = 0 ] ; then
