@@ -108,11 +108,9 @@ jobs:
           ################################################################################################
           #因不同型号配置功能不一样，所以先把配置项删除，如果你自己要添加其他的，也要写上删除这一条，切记！！！
           ################################################################################################
-          sed -i '/CONFIG_FIRMWARE_WIFI2_DRIVER=3.0/d' .config
           sed -i '/CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_SERVER/d' .config #删除配置项SOFTETHERVPN
           sed -i '/CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_CLIENT/d' .config #删除配置项SOFTETHERVPN
-          sed -i '/CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_CMD/d' .config #删除配置项SOFTETHERVPN
-          sed -i '/CONFIG_FIRMWARE_WEBUI_HIDE_VPN/d' .config
+          sed -i '/CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_CMD/d' .config #删除配置项SOFTETHERVPN        
           sed -i '/CONFIG_FIRMWARE_INCLUDE_SHADOWSOCKS/d' .config #删除配置项SS plus+
           sed -i '/CONFIG_FIRMWARE_INCLUDE_SSSERVER/d' .config #删除配置项SS server
           sed -i '/CONFIG_FIRMWARE_INCLUDE_DNSFORWARDER/d' .config #删除配置项DNSFORWARDER
@@ -127,7 +125,6 @@ jobs:
           sed -i '/CONFIG_FIRMWARE_INCLUDE_IPT2SOCKS/d' .config
           sed -i '/CONFIG_FIRMWARE_INCLUDE_MICROSOCKS/d' .config
           sed -i '/CONFIG_FIRMWARE_INCLUDE_SFE/d' .config #删除配置项SFE加速
-          sed -i '/CONFIG_FIRMWARE_INCLUDE_OPENSSL_EXE/d' .config
           #校园网相关
           sed -i '/CONFIG_FIRMWARE_INCLUDE_MENTOHUST/d' .config #删除配置项MENTOHUST
           sed -i '/CONFIG_FIRMWARE_INCLUDE_SCUTCLIENT/d' .config #删除配置项SCUTCLIENT
@@ -135,21 +132,19 @@ jobs:
           sed -i '/CONFIG_FIRMWARE_INCLUDE_NJIT_CLIENT/d' .config
           sed -i '/CONFIG_FIRMWARE_INCLUDE_MINIEAP/d' .config
           sed -i '/CONFIG_FIRMWARE_INCLUDE_DOGCOM/d' .config
+          sed -i '/CONFIG_FIRMWARE_INCLUDE_TTYD/d' .config
+          sed -i '/CONFIG_FIRMWARE_INCLUDE_NANO/d' .config
+          sed -i '/CONFIG_FIRMWARE_INCLUDE_VLMCSD/d' .config
+          sed -i '/CONFIG_FIRMWARE_INCLUDE_HTOP/d' .config
+          sed -i '/CONFIG_FIRMWARE_INCLUDE_MTR/d' .config
+          #校园网相关
+          sed -i 's/CONFIG_FIRMWARE_INCLUDE_OPENSSL_EXE=n/CONFIG_FIRMWARE_INCLUDE_OPENSSL_EXE=y/g' .config
           ######################################################################
           #以下选项是定义你需要的功能（y=集成,n=忽略），重新写入到.config文件
           ######################################################################        
-          #2.4G 驱动选择
-          ### 2.7 = MT7620 v2.7.2.0
-          ### 3.0 = MT7620 v3.0.4.0
-          echo "CONFIG_FIRMWARE_WIFI2_DRIVER=3.0" >> .config
-          #
-          ##包含 "openssl" 可执行程序，用于生成证书。约 0.4MB
-          echo "CONFIG_FIRMWARE_INCLUDE_OPENSSL_EXE=n" >> .config
-          #
           echo "CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_SERVER=n" >> .config #SOFTETHERVPN
           echo "CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_CLIENT=n" >> .config #SOFTETHERVPN
           echo "CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_CMD=n" >> .config #SOFTETHERVPN
-          echo "CONFIG_FIRMWARE_WEBUI_HIDE_VPN=n" >> .config
           echo "CONFIG_FIRMWARE_INCLUDE_SFE=n" >> .config #集成SFE加速
           #
           echo "CONFIG_FIRMWARE_INCLUDE_SHADOWSOCKS=n" >> .config #SS plus+
@@ -190,6 +185,11 @@ jobs:
           echo "CONFIG_FIRMWARE_INCLUDE_MINIEAP=n" >> .config
           echo "CONFIG_FIRMWARE_INCLUDE_DOGCOM=n" >> .config
           echo "CONFIG_FIRMWARE_INCLUDE_NAPT66=n" >> .config
+          echo "CONFIG_FIRMWARE_INCLUDE_TTYD=n" >> .config
+          echo "CONFIG_FIRMWARE_INCLUDE_NANO=n" >> .config
+          echo "CONFIG_FIRMWARE_INCLUDE_VLMCSD=n" >> .config
+          echo "CONFIG_FIRMWARE_INCLUDE_HTOP=n" >> .config
+          echo "CONFIG_FIRMWARE_INCLUDE_MTR=n" >> .config
           #校园网相关
           #########################################################################################
           #自定义添加其它功能请参考源码configs/templates/目录下的config文件。按照上面的格式添加即可
