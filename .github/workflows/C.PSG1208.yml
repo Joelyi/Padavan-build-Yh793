@@ -127,6 +127,7 @@ jobs:
           sed -i '/CONFIG_FIRMWARE_INCLUDE_IPT2SOCKS/d' .config
           sed -i '/CONFIG_FIRMWARE_INCLUDE_MICROSOCKS/d' .config
           sed -i '/CONFIG_FIRMWARE_INCLUDE_SFE/d' .config #删除配置项SFE加速
+          sed -i '/CONFIG_FIRMWARE_INCLUDE_OPENSSL_EXE/d' .config
           #校园网相关
           sed -i '/CONFIG_FIRMWARE_INCLUDE_MENTOHUST/d' .config #删除配置项MENTOHUST
           sed -i '/CONFIG_FIRMWARE_INCLUDE_SCUTCLIENT/d' .config #删除配置项SCUTCLIENT
@@ -134,8 +135,6 @@ jobs:
           sed -i '/CONFIG_FIRMWARE_INCLUDE_NJIT_CLIENT/d' .config
           sed -i '/CONFIG_FIRMWARE_INCLUDE_MINIEAP/d' .config
           sed -i '/CONFIG_FIRMWARE_INCLUDE_DOGCOM/d' .config
-          #校园网相关
-          sed -i 's/CONFIG_FIRMWARE_INCLUDE_OPENSSL_EXE=n/CONFIG_FIRMWARE_INCLUDE_OPENSSL_EXE=y/g' .config
           ######################################################################
           #以下选项是定义你需要的功能（y=集成,n=忽略），重新写入到.config文件
           ######################################################################        
@@ -143,6 +142,9 @@ jobs:
           ### 2.7 = MT7620 v2.7.2.0
           ### 3.0 = MT7620 v3.0.4.0
           echo "CONFIG_FIRMWARE_WIFI2_DRIVER=3.0" >> .config
+          #
+          ##包含 "openssl" 可执行程序，用于生成证书。约 0.4MB
+          echo "CONFIG_FIRMWARE_INCLUDE_OPENSSL_EXE=n" >> .config
           #
           echo "CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_SERVER=n" >> .config #SOFTETHERVPN
           echo "CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_CLIENT=n" >> .config #SOFTETHERVPN
