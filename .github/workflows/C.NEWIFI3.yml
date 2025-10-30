@@ -82,6 +82,9 @@ jobs:
           cd /opt/padavan/wifi/
           sh install_wifi.sh
           #
+          cd /opt/padavan/wifi/mt7603-4.1.2.1/
+          sh install_4.1.2.1_wifi.sh
+          #
           cd /opt/padavan/NEWIFI3/
           sh install_Setconfig.sh
           #
