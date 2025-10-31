@@ -388,7 +388,7 @@ jobs:
         echo "CONFIG_FIRMWARE_INCLUDE_NANO=n" >> .config
 
          ## iperf3测速软件
-        echo "CONFIG_FIRMWARE_INCLUDE_IPERF3=y" >> .config
+        echo "CONFIG_FIRMWARE_INCLUDE_IPERF3=n" >> .config
 
         ## DUMP1090
         echo "CONFIG_FIRMWARE_INCLUDE_DUMP1090=n" >> .config
@@ -397,7 +397,7 @@ jobs:
         echo "CONFIG_FIRMWARE_INCLUDE_RTL_SDR=n" >> .config
 
         ## MTR
-        echo "CONFIG_FIRMWARE_INCLUDE_MTR=y" >> .config
+        echo "CONFIG_FIRMWARE_INCLUDE_MTR=n" >> .config
 
         ## ipv6端口转发工具
         echo "CONFIG_FIRMWARE_INCLUDE_SOCAT=n" >> .config
