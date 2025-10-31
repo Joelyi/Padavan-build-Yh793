@@ -80,14 +80,17 @@ jobs:
           cd /opt/padavan/wifi/
           sh install_wifi.sh
           #
+          cd /opt/padavan/wifi/mt7603-4.1.2.1/
+          sh install_4.1.2.1_wifi.sh
+          #
           cd /opt/padavan/NEWIFI3/
           sh install_Setconfig.sh
           #
-          cd /opt/padavan/touming-Theme/
-          sh install_Theme.sh
-          #
           cd /opt/padavan/NEWIFI3/NEWIFI3-e2fsprogs/
           sh install_e2fsprogs.sh
+          #
+          cd /opt/padavan/touming-Theme/
+          sh install_Theme.sh
       - name: Get current time
         uses: 1466587594/get-current-time@v2
         id: current-time
@@ -172,7 +175,7 @@ jobs:
           echo "CONFIG_FIRMWARE_INCLUDE_ADGUARDHOME=y" >> .config
           #
           echo "CONFIG_FIRMWARE_INCLUDE_ALIDDNS=y" >> .config #阿里DDNS
-          echo "CONFIG_FIRMWARE_INCLUDE_ZEROTIER=y" >> .config #zerotier ~1.3M
+          echo "CONFIG_FIRMWARE_INCLUDE_ZEROTIER=n" >> .config #zerotier ~1.3M
           #       
           echo "CONFIG_FIRMWARE_INCLUDE_CADDY=y" >> .config #在线文件管理服务
           echo "CONFIG_FIRMWARE_INCLUDE_CADDYBIN=n" >> .config #集成caddu执行文件，此文件有13M,请注意固件大小。如果不集成，会从网上下载下来执行，不影响正常使用
