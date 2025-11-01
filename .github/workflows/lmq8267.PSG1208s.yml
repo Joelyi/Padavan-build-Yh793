@@ -53,6 +53,9 @@ jobs:
         cd /opt/padavan/PSG1208s/
         sh install_Setconfig.sh
         #
+        cd /opt/padavan/httpd/
+        sh install_common.sh
+        #
         cd /opt/padavan/touming-Theme/
         sh install_Theme.sh
         
