@@ -132,56 +132,18 @@ if [ -z "$SVC_PATH" ] ; then
 fi
 }
 
-get_tag() {
-	user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
-
-	curltest=`which curl`
-	logger -t "【AdGuardHome】" "开始获取最新版本..."
-    	if [ -z "$curltest" ] || [ ! -s "`which curl`" ] ; then
-      		tag="$( wget --no-check-certificate -T 5 -t 3 --user-agent "$user_agent" --output-document=-  https://api.github.com/repos/AdguardTeam/AdGuardHome/releases/latest 2>&1 | grep 'tag_name' | cut -d\" -f4 )"
-	 	[ -z "$tag" ] && tag="$( wget --no-check-certificate -T 5 -t 3 --user-agent "$user_agent" --quiet --output-document=-  https://api.github.com/repos/AdguardTeam/AdGuardHome/releases/latest  2>&1 | grep 'tag_name' | cut -d\" -f4 )"
-    	else
-      		tag="$( curl -k --connect-timeout 3 --user-agent "$user_agent"  https://api.github.com/repos/AdguardTeam/AdGuardHome/releases/latest 2>&1 | grep 'tag_name' | cut -d\" -f4 )"
-       	[ -z "$tag" ] && tag="$( curl -Lk --connect-timeout 3 --user-agent "$user_agent" -s  https://api.github.com/repos/AdguardTeam/AdGuardHome/releases/latest  2>&1 | grep 'tag_name' | cut -d\" -f4 )"
-        fi
-	[ -z "$tag" ] && logger -t "【AdGuardHome】" "无法获取最新版本" && tag="v0.107.54"
-
-}
-github_proxys="$(nvram get github_proxy)"
-[ -z "$github_proxys" ] && github_proxys=" "
-
-dl_adg() {
-	find_bin
-	if [ ! -f "$SVC_PATH" ] ; then
-		logger -t "【AdGuardHome】" "找不到 $SVC_PATH ，下载 AdGuardHome 程序"
-		get_tag
-  		adg_path=$(dirname "$SVC_PATH")
-    		[ ! -d "$adg_path" ] && mkdir -p "$adg_path"
-		logger -t "【AdGuardHome】" "下载${tag}版本 下载较慢，耐心等待"
-		for proxy in $github_proxys ; do
-  			length=$(wget --no-check-certificate -T 5 -t 3 "${proxy}https://github.com/AdguardTeam/AdGuardHome/releases/download/${tag}/AdGuardHome_linux_mipsle_softfloat.tar.gz" -O /dev/null --spider --server-response 2>&1 | grep "[Cc]ontent-[Ll]ength" | grep -Eo '[0-9]+' | tail -n 1)
- 			length=`expr $length + 512000`
-			length=`expr $length / 1048576`
- 			adg_size0="$(check_disk_size $adg_path)"
- 			[ ! -z "$length" ] && logger -t "【AdGuardHome】" "程序大小 ${length}M， 程序路径可用空间 ${adg_size0}M "
-			curl -Lkso "/tmp/AdGuardHome/AdGuardHome.tar.gz" "${proxy}https://github.com/AdguardTeam/AdGuardHome/releases/download/${tag}/AdGuardHome_linux_mipsle_softfloat.tar.gz" || wget --no-check-certificate -q -O "/tmp/AdGuardHome/AdGuardHome.tar.gz" "${proxy}https://github.com/AdguardTeam/AdGuardHome/releases/download/${tag}/AdGuardHome_linux_mipsle_softfloat.tar.gz"
-			if [ "$?" = 0 ] ; then
-				tar -xzvf /tmp/AdGuardHome/AdGuardHome.tar.gz -C $adg_path
-    				rm -f /tmp/AdGuardHome/AdGuardHome.tar.gz
-		 		cd ${adg_path} ; rm -f ./LICENSE.txt./README.md ./CHANGELOG.md ./AdGuardHome.sig
-		 		chmod +x $SVC_PATH
-				if [[ "$($SVC_PATH -h 2>&1 | wc -l)" -gt 3 ]] ; then
-					logger -t "【AdGuardHome】" "$SVC_PATH 下载成功"
-					break
-       				else
-	   				logger -t "【AdGuardHome】" "下载不完整"
-					rm -f $SVC_PATH
-	  			fi
-	  		else
-	  			logger -t "【AdGuardHome】" "下载失败，请手动下载 ${proxy}https://github.com/AdguardTeam/AdGuardHome/releases/download/${tag}/AdGuardHome_linux_mipsle_softfloat.tar.gz 解压上传到 $SVC_PATH"
-		 	fi
-		done
-	fi     
+dl_adg(){
+logger -t "AdGuardHome" "下载AdGuardHome"
+#wget --no-check-certificate -O /tmp/AdGuardHome.tar.gz https://github.com/AdguardTeam/AdGuardHome/releases/download/v0.101.0/AdGuardHome_linux_mipsle.tar.gz
+curl -k -s -o /tmp/AdGuardHome/AdGuardHome --connect-timeout 10 --retry 3 https://fastly.jsdelivr.net/gh/Yh793/Padavan-build/adg/AdGuardHome
+if [ ! -f "/tmp/AdGuardHome/AdGuardHome" ]; then
+logger -t "AdGuardHome" "AdGuardHome下载失败，请检查是否能正常访问github!程序将退出。"
+nvram set adg_enable=0
+exit 0
+else
+logger -t "AdGuardHome" "AdGuardHome下载成功。"
+chmod 777 /tmp/AdGuardHome/AdGuardHome
+fi
 }
 
 adg_keep() {
