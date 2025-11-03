@@ -57,10 +57,10 @@ clear_iptable() {
 
 }
 
-getconfig() {
+getconfig(){
 adg_file="/etc/storage/adg.sh"
 if [ ! -f "$adg_file" ] || [ ! -s "$adg_file" ] ; then
-  cat > "$adg_file" <<-\EEE
+	cat > "$adg_file" <<-\EEE
 http:
   address: 0.0.0.0:3030
 auth_name: admin
@@ -76,9 +76,40 @@ dns:
   all_servers: true
 tls:
   enabled: false
+filters:
+- enabled: true
+  url: https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt
+  name: AdGuard Simplified Domain Names filter
+  id: 1
+- enabled: true
+  url: https://adaway.org/hosts.txt
+  name: AdAway
+  id: 2
+- enabled: true
+  url: https://hosts-file.net/ad_servers.txt
+  name: hpHosts - Ad and Tracking servers only
+  id: 3
+- enabled: true
+  url: https://www.malwaredomainlist.com/hostslist/hosts.txt
+  name: MalwareDomainList.com Hosts List
+  id: 4
+user_rules: []
+dhcp:
+  enabled: false
+  interface_name: ""
+  gateway_ip: ""
+  subnet_mask: ""
+  range_start: ""
+  range_end: ""
+  lease_duration: 86400
+  icmp_timeout_msec: 1000
+clients: []
+log_file: ""
+verbose: false
+schema_version: 3
 
 EEE
-  chmod 755 "$adg_file"
+	chmod 755 "$adg_file"
 fi
 }
 adg_renum=`nvram get adg_renum`
