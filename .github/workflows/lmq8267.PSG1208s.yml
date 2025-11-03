@@ -55,9 +55,6 @@ jobs:
         #
         cd /opt/padavan/touming-Theme/
         sh install_Theme.sh
-        #
-        cd /opt/padavan/adg/
-        sh install_adguardhome.sh
         
     - name: Build Firmware
       env:
