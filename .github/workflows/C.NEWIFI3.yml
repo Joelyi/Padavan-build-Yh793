@@ -94,10 +94,10 @@ jobs:
           cd /opt/padavan/touming-Theme/
           sh install_Theme.sh
           
-      - name: Download package
-        run: |
-          cd //opt/rt-n56u/trunk/linux-3.4.x
-          make config
+      #- name: Download package
+      #  run: |
+      #    cd /opt/rt-n56u/trunk/linux-3.4.x
+      #    make config
       - name: Get current time
         uses: 1466587594/get-current-time@v2
         id: current-time
