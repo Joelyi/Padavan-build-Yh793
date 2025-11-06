@@ -1,8 +1,20 @@
 #修改40行的TNAME: NEWIFI3 中的NEWIFI3为你需要编译的型号，注意名称要与trunk/configs/templates/目录下的名字相同
 name: lmq8267.PSG1208s
 
-on: 
+on:
   workflow_dispatch:
+    inputs:
+      firmwarever:
+        description: 'firmware''s version'
+        required: true
+        default: 'build'
+      busyboxver:
+        type: choice
+        description: 'busybox''s version'
+        options:
+        - 1.24.x
+        - 1.34.1
+        default: '1.24.x'
 
 #设置仓库的读写权限
 permissions:
@@ -34,11 +46,13 @@ jobs:
         sudo apt-get -y install unzip libtool-bin curl cmake gperf gawk flex bison nano xxd fakeroot \
         cpio git python3-docutils gettext automake autopoint texinfo build-essential help2man \
         pkg-config zlib1g-dev libgmp3-dev libmpc-dev libmpfr-dev libncurses5-dev libltdl-dev wget
+        
     - name: Install UPX
       uses: crazy-max/ghaction-upx@v3
       with:
         version: v4.2.4
         install-only: true
+        
     - name: Clone source code
       env:
         KERNEL: 3.4
@@ -47,6 +61,13 @@ jobs:
         cd /opt/rt-n56u/toolchain-mipsel
         sh dl_toolchain.sh
         mkdir -p /opt/images/
+        
+    - name: Set busybox's version to compile
+      run: |
+        cd $WORK_PATH/trunk/user/busybox
+        sed -i "s/SRC_NAME=busybox.*/SRC_NAME=busybox-${{ github.event.inputs.busyboxver }}/g" ./Makefile
+        cd $WORK_PATH/trunk
+        sed -i "s/busybox_id=.*/busybox_id=\"${{ github.event.inputs.busyboxver }}\"/g" ./build_firmware_modify
         
     - name: Recovery bin files download from remote
       run: |
