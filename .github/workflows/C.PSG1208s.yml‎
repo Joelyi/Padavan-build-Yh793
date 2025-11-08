@@ -8,17 +8,9 @@ on:
         description: "Build Padavan"
         required: true
         default: "build"
-  # release:
-  #   types: [published]
   push:
     tags:
       - "v*"
-  #  branches:
-  #    - master
-  #  schedule:
-  #    - cron: 0 8 * * 5
-  #watch:
-  #  types: [started]
 
 jobs:
   build:
@@ -27,32 +19,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      #- uses: hendrikmuhs/ccache-action@v1.2
-      - uses: actions/setup-go@v3
-        with:
-          go-version: '^1.18.6'
-      #- uses: actions/cache@v3
-      #  with:
-      #    path: |
-      #      ~/.cache/go-build
-      #      ~/go/pkg/mod
-      #    key: ${{ runner.os }}-go-v1
-      #    restore-keys: |
-      #      ${{ runner.os }}-go-
         env:
           token: ${{ secrets.R_TOKEN }}
       - name: Prepare
         run: |
-         echo "###########################"
-          pwd
-          #
-          sudo mv padavan /opt/
-          cd /opt/padavan
-          echo "sudo ls -l"
-          pwd
-          sudo ls -l
-          echo "###########################"
-          #
           sudo apt-get update
           sudo apt update
           sudo apt install libtool-bin gperf python3-docutils autopoint gettext ccache
@@ -78,13 +48,13 @@ jobs:
 
       - name: Recovery bin files download from remote
         run: |
-          cd /opt/padavan/wifi/
+          cd /opt/Padavan/wifi/
           sh install_wifi.sh
           #
-          cd /opt/padavan/PSG1208s/
+          cd /opt/PSG1208s/
           sh install_Setconfig.sh
           #
-          cd /opt/padavan/touming-Theme/
+          cd /opt/Padavan/touming-Theme/
           sh install_Theme.sh
 
       - name: Get current time
