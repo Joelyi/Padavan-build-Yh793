@@ -75,18 +75,16 @@ jobs:
           sed -i '34,40s/^/#/' ./Makefile
           cd /opt/rt-n56u/trunk/user/rc
           sed -i '/DNS_RELAY_CACHE_MAX/d' ./services_ex.c
-
       - name: Recovery bin files download from remote
         run: |
           cd /opt/padavan/wifi/
           sh install_wifi.sh
           #
-          cd /opt/padavan/PSG1218/
+          cd /opt/padavan/PSG1208s/
           sh install_Setconfig.sh
           #
           cd /opt/padavan/touming-Theme/
           sh install_Theme.sh
-
       - name: Get current time
         uses: josStorer/get-current-time@v2.0.2
         id: current-time
@@ -96,7 +94,7 @@ jobs:
 
       - name: Build Firmware
         env:
-          TNAME: PSG1218 #PSG1218 K2P-5.0 K2P K2P_nano K2P_nano-5.0 PSG1208 PSG1218_nano
+          TNAME: PSG1208s #PSG1218 K2P-5.0 K2P K2P_nano K2P_nano-5.0 PSG1208 PSG1218_nano
         run: |
           cd /opt/rt-n56u/trunk
           if [ ! -f configs/templates/$TNAME.config ] ; then
@@ -108,7 +106,6 @@ jobs:
           ################################################################################################
           #因不同型号配置功能不一样，所以先把配置项删除，如果你自己要添加其他的，也要写上删除这一条，切记！！！
           ################################################################################################
-          sed -i '/CONFIG_FIRMWARE_WIFI2_DRIVER=3.0/d' .config
           sed -i '/CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_SERVER/d' .config #删除配置项SOFTETHERVPN
           sed -i '/CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_CLIENT/d' .config #删除配置项SOFTETHERVPN
           sed -i '/CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_CMD/d' .config #删除配置项SOFTETHERVPN        
@@ -143,11 +140,6 @@ jobs:
           ######################################################################
           #以下选项是定义你需要的功能（y=集成,n=忽略），重新写入到.config文件
           ######################################################################        
-          #2.4G 驱动选择
-          ### 2.7 = MT7620 v2.7.2.0
-          ### 3.0 = MT7620 v3.0.4.0
-          echo "CONFIG_FIRMWARE_WIFI2_DRIVER=2.7" >> .config
-          #
           echo "CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_SERVER=n" >> .config #SOFTETHERVPN
           echo "CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_CLIENT=n" >> .config #SOFTETHERVPN
           echo "CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_CMD=n" >> .config #SOFTETHERVPN
@@ -214,5 +206,5 @@ jobs:
         uses: actions/upload-artifact@main
         if: env.BUILDDONE == 'success'
         with:
-          name: C.PSG1218-Padavan-packages
+          name: C.PSG1208s-Padavan-packages
           path: /opt/images
