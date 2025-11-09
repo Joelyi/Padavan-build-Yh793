@@ -8,17 +8,9 @@ on:
         description: "Build Padavan"
         required: true
         default: "build"
-  # release:
-  #   types: [published]
   push:
     tags:
       - "v*"
-  #  branches:
-  #    - master
-  #  schedule:
-  #    - cron: 0 8 * * 5
-  #watch:
-  #  types: [started]
 
 jobs:
   build:
@@ -27,32 +19,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      #- uses: hendrikmuhs/ccache-action@v1.2
-      - uses: actions/setup-go@v3
-        with:
-          go-version: '^1.18.6'
-      #- uses: actions/cache@v3
-      #  with:
-      #    path: |
-      #      ~/.cache/go-build
-      #      ~/go/pkg/mod
-      #    key: ${{ runner.os }}-go-v1
-      #    restore-keys: |
-      #      ${{ runner.os }}-go-
         env:
           token: ${{ secrets.R_TOKEN }}
       - name: Prepare
         run: |
-         echo "###########################"
-          pwd
-          #
-          sudo mv padavan /opt/
-          cd /opt/padavan
-          echo "sudo ls -l"
-          pwd
-          sudo ls -l
-          echo "###########################"
-          #
           sudo apt-get update
           sudo apt update
           sudo apt install libtool-bin gperf python3-docutils autopoint gettext ccache
@@ -76,15 +46,17 @@ jobs:
           cd /opt/rt-n56u/trunk/user/rc
           sed -i '/DNS_RELAY_CACHE_MAX/d' ./services_ex.c
 
+      - name: Recovery wifi files download from remote
+        run: |
+          cd Padavan/wifi
+          sh install_wifi.sh
       - name: Recovery bin files download from remote
         run: |
-          cd /opt/padavan/wifi/
-          sh install_wifi.sh
-          #
-          cd /opt/padavan/PSG1218/
+          cd PSG1218
           sh install_Setconfig.sh
-          #
-          cd /opt/padavan/touming-Theme/
+      - name: Recovery theme files download from remote
+        run: |
+          cd Padavan/touming-Theme
           sh install_Theme.sh
 
       - name: Get current time
