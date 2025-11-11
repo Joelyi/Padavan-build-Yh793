@@ -48,7 +48,7 @@ jobs:
           sh install_Setconfig.sh
       - name: Recovery theme files download from remote
         run: |
-          cd touming-Theme
+          cd theme
           sh install_Theme.sh
 
       - name: Get current time
