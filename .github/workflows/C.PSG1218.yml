@@ -37,14 +37,6 @@ jobs:
           tar -xvf mipsel-linux-uclibc.tar.xz -C toolchain-3.4.x
           #sh dl_toolchain.sh
           mkdir -p /opt/images/
-      - name: adapt project
-        run: |
-          cd /opt/rt-n56u/trunk/user/adguardhome
-          sed -i "s#https://cdn.jsdelivr.net/gh/chongshengB/rt-n56u/trunk/user/adguardhome/AdGuardHome#https://cdn.jsdelivr.net/gh/Yh793/Padavan-build/adg/AdGuardHome#g" ./adguardhome.sh
-          cd /opt/rt-n56u/trunk/tools
-          sed -i '34,40s/^/#/' ./Makefile
-          cd /opt/rt-n56u/trunk/user/rc
-          sed -i '/DNS_RELAY_CACHE_MAX/d' ./services_ex.c
 
       - name: Recovery wifi files download from remote
         run: |
