@@ -1,5 +1,5 @@
 #修改TNAME: K2P-5.0 中的K2P-5.0为你需要编译的型号，注意名称要与configs/templates/目录下的名字相同
-name: C.PSG1208s
+name: Build K1s from Yh793 repo
 
 on:
   workflow_dispatch:
@@ -8,83 +8,89 @@ on:
         description: "Build Padavan"
         required: true
         default: "build"
-  # release:
-  #   types: [published]
-  push:
-    tags:
-      - "v*"
-  #  branches:
-  #    - master
-  #  schedule:
-  #    - cron: 0 8 * * 5
-  #watch:
-  #  types: [started]
+      busyboxver:
+        type: choice
+        description: 'busybox''s version'
+        options:
+        - 1.24.x
+        - 1.34.1
+        default: '1.24.x'
+      theme:
+        type: boolean
+        description: '是否替换主题文件'
+        default: 'false'
+      wifi:
+        type: boolean
+        description: '是否替换wifi文件'
+        default: 'false'
 
+#设置仓库的读写权限
+permissions:
+  contents: write
+
+env:
+  REPOSITORY_URL: https://github.com/Yh793/rt-n56u.git
+  TOOLCHAIN_URL: https://github.com/Yh793/Padavan-build/raw/master/mipsel-linux-uclibc.tar.xz
+  WORK_PATH: /opt/rt-n56u
+  TNAME: PSG1208s
+  
 jobs:
   build:
     runs-on: ubuntu-22.04
     if: github.event.repository.owner.id == github.event.sender.id
 
     steps:
-      - uses: actions/checkout@v3
-      #- uses: hendrikmuhs/ccache-action@v1.2
-      - uses: actions/setup-go@v3
-        with:
-          go-version: '^1.18.6'
-      #- uses: actions/cache@v3
-      #  with:
-      #    path: |
-      #      ~/.cache/go-build
-      #      ~/go/pkg/mod
-      #    key: ${{ runner.os }}-go-v1
-      #    restore-keys: |
-      #      ${{ runner.os }}-go-
+      - uses: actions/checkout@master
         env:
           token: ${{ secrets.R_TOKEN }}
-      - name: Prepare
+      - name: Initialization environment
         run: |
-         echo "###########################"
-          pwd
-          #
-          sudo mv padavan /opt/
-          cd /opt/padavan
-          echo "sudo ls -l"
-          pwd
-          sudo ls -l
-          echo "###########################"
-          #
           sudo apt-get update
-          sudo apt update
-          sudo apt install libtool-bin gperf python3-docutils autopoint gettext ccache
-          # https://github.com/actions/setup-go/issues/107
-          echo "${GOROOT}/bin" >> $GITHUB_PATH
+          sudo apt-get -y install unzip libtool-bin curl cmake gperf gawk flex bison nano xxd fakeroot \
+          cpio git python3-docutils gettext automake autopoint texinfo build-essential help2man \
+          pkg-config zlib1g-dev libgmp3-dev libmpc-dev libmpfr-dev libncurses5-dev libltdl-dev wget
+          
       - name: Clone source code
         run: |
-          git clone -b chongshengB --depth=1 https://github.com/Yh793/rt-n56u.git /opt/rt-n56u
-          cd /opt/rt-n56u/toolchain-mipsel
-          curl -O -L  https://github.com/Yh793/Padavan-build/raw/master/mipsel-linux-uclibc.tar.xz
+          git clone -b chongshengB --depth=1 $REPOSITORY_URL $WORK_PATH
+          cd /$WORK_PATH/toolchain-mipsel
+          #sh dl_toolchain.sh
+          curl -O -L  $TOOLCHAIN_URL
           mkdir -p toolchain-3.4.x
           tar -xvf mipsel-linux-uclibc.tar.xz -C toolchain-3.4.x
-          #sh dl_toolchain.sh
           mkdir -p /opt/images/
-      - name: adapt project
+
+      - name: newly build boards
         run: |
-          cd /opt/rt-n56u/trunk/user/adguardhome
-          sed -i "s#https://cdn.jsdelivr.net/gh/chongshengB/rt-n56u/trunk/user/adguardhome/AdGuardHome#https://cdn.jsdelivr.net/gh/Yh793/Padavan-build/adg/AdGuardHome#g" ./adguardhome.sh
-          cd /opt/rt-n56u/trunk/tools
-          sed -i '34,40s/^/#/' ./Makefile
-          cd /opt/rt-n56u/trunk/user/rc
-          sed -i '/DNS_RELAY_CACHE_MAX/d' ./services_ex.c
+          cd $WORK_PATH/trunk/configs/boards
+          mkdir $TNAME
+        
+      - name: Recovery Padavan files download from remote
+        run: |
+          cp -rf Padavan/busybox-1.24.x $WORK_PATH/trunk/user
       - name: Recovery bin files download from remote
         run: |
-          cd /opt/padavan/wifi/
-          sh install_wifi.sh
-          #
-          cd /opt/padavan/PSG1208s/
-          sh install_Setconfig.sh
-          #
-          cd /opt/padavan/touming-Theme/
-          sh install_Theme.sh
+          cp -f $TNAME/$TNAME.config $WORK_PATH/trunk/configs/templates/$TNAME.config
+          cp -f $TNAME/board.h $WORK_PATH/trunk/configs/boards/$TNAME/board.h
+          cp -f $TNAME/board.mk $WORK_PATH/trunk/configs/boards/$TNAME/board.mk
+          cp -f $TNAME/kernel-3.4.x.config $WORK_PATH/trunk/configs/boards/$TNAME/kernel-3.4.x.config
+          #cd $WORK_PATH/trunk/tools
+          #sed -i "s#1.15.2#1.21.1#g" ./Makefile
+          #sed -i "s#https://gomirrors.org/dl/go#https://dl.google.com/go#g" ./Makefile
+          echo "复制配置文件结束"  
+      - name: Recovery theme files download from remote
+        if: github.event.inputs.theme == 'true'
+        run: |
+          sudo rm -rf $WORK_PATH/trunk/user/www/n56u_ribbon_fixed/bootstrap
+          sudo rm -rf $WORK_PATH/trunk/user/www/n56u_ribbon_fixed/images
+          cp -rf theme/. $WORK_PATH/trunk/user/www/n56u_ribbon_fixed
+          echo "复制主题文件结束"  
+      - name: Recovery wifi files download from remote
+        if: github.event.inputs.wifi == 'true'
+        run: |
+          sudo rm -rf $WORK_PATH/trunk/proprietary
+          cp -rf wifi/. $WORK_PATH/trunk
+
       - name: Get current time
         uses: josStorer/get-current-time@v2.0.2
         id: current-time
@@ -93,10 +99,8 @@ jobs:
           utcOffset: "+08:00"
 
       - name: Build Firmware
-        env:
-          TNAME: PSG1208s #PSG1218 K2P-5.0 K2P K2P_nano K2P_nano-5.0 PSG1208 PSG1218_nano
         run: |
-          cd /opt/rt-n56u/trunk
+          cd $WORK_PATH/trunk
           if [ ! -f configs/templates/$TNAME.config ] ; then
           echo "configs/templates/$TNAME.config not found "
           exit 1
@@ -106,6 +110,7 @@ jobs:
           ################################################################################################
           #因不同型号配置功能不一样，所以先把配置项删除，如果你自己要添加其他的，也要写上删除这一条，切记！！！
           ################################################################################################
+          sed -i '/CONFIG_FIRMWARE_WIFI2_DRIVER=3.0/d' .config
           sed -i '/CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_SERVER/d' .config #删除配置项SOFTETHERVPN
           sed -i '/CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_CLIENT/d' .config #删除配置项SOFTETHERVPN
           sed -i '/CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_CMD/d' .config #删除配置项SOFTETHERVPN        
@@ -140,6 +145,11 @@ jobs:
           ######################################################################
           #以下选项是定义你需要的功能（y=集成,n=忽略），重新写入到.config文件
           ######################################################################        
+          #2.4G 驱动选择
+          ### 2.7 = MT7620 v2.7.2.0
+          ### 3.0 = MT7620 v3.0.4.0
+          echo "CONFIG_FIRMWARE_WIFI2_DRIVER=3.0" >> .config
+          #
           echo "CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_SERVER=n" >> .config #SOFTETHERVPN
           echo "CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_CLIENT=n" >> .config #SOFTETHERVPN
           echo "CONFIG_FIRMWARE_INCLUDE_SOFTETHERVPN_CMD=n" >> .config #SOFTETHERVPN
@@ -197,7 +207,7 @@ jobs:
           #########################################################################################
           sudo ./clear_tree
           sudo ./build_firmware_modify $TNAME 0
-          sudo mv -f images/*.trx /opt/images/${TNAME}_Yh793-ChongshengB_${{ steps.current-time.outputs.formattedTime }}.trx
+          sudo mv -f images/*.trx /opt/images/${TNAME}_ChongshengB_${{ steps.current-time.outputs.formattedTime }}.trx
           cp -f .config /opt/images/${TNAME}.config
           echo "FNAME=$TNAME" >> $GITHUB_ENV
           echo "BUILDDONE=success" >> $GITHUB_ENV
@@ -206,5 +216,5 @@ jobs:
         uses: actions/upload-artifact@main
         if: env.BUILDDONE == 'success'
         with:
-          name: C.PSG1208s-Padavan-packages
+          name: Yh793_K1s-Padavan-packages
           path: /opt/images

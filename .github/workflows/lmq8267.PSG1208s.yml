@@ -15,12 +15,33 @@ on:
         - 1.24.x
         - 1.34.1
         default: '1.24.x'
+      padavanbin:
+        type: boolean
+        description: '是否替换编译文件'
+        default: 'true'
+      config:
+        type: boolean
+        description: '是否替换配置文件'
+        default: 'true'
+      theme:
+        type: boolean
+        description: '是否替换主题文件'
+        default: 'false'
+      wifi:
+        type: boolean
+        description: '是否替换wifi文件'
+        default: 'false'
 
 #设置仓库的读写权限
 permissions:
   contents: write
 env:
   TZ: Asia/Shanghai
+  REPOSITORY_URL: https://github.com/lmq8267/padavan-KVR.git
+  TOOLCHAIN_URL: https://github.com/Yh793/Padavan-build/raw/master/mipsel-linux-uclibc.tar.xz
+  WORK_PATH: /opt/rt-n56u
+  TNAME: PSG1208s
+  
 jobs:
   build:
     runs-on: ubuntu-22.04
@@ -32,16 +53,6 @@ jobs:
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
-       echo "###########################"
-        pwd
-        #
-        sudo mv Padavan /opt/
-        cd /opt/Padavan
-        echo "sudo ls -l"
-        pwd
-        sudo ls -l
-        echo "###########################"
-        #
         sudo apt-get update
         sudo apt-get -y install unzip libtool-bin curl cmake gperf gawk flex bison nano xxd fakeroot \
         cpio git python3-docutils gettext automake autopoint texinfo build-essential help2man \
@@ -54,12 +65,13 @@ jobs:
         install-only: true
         
     - name: Clone source code
-      env:
-        KERNEL: 3.4
       run: |
-        git clone --depth=1 https://github.com/lmq8267/padavan-KVR.git /opt/rt-n56u
-        cd /opt/rt-n56u/toolchain-mipsel
-        sh dl_toolchain.sh
+        git clone --depth=1 $REPOSITORY_URL $WORK_PATH
+        cd /$WORK_PATH/toolchain-mipsel
+        curl -O -L  $TOOLCHAIN_URL
+        mkdir -p toolchain-3.4.x
+        tar -xvf mipsel-linux-uclibc.tar.xz -C toolchain-3.4.x
+        #sh dl_toolchain.sh
         mkdir -p /opt/images/
         
     - name: Set busybox's version to compile
@@ -68,19 +80,46 @@ jobs:
         sed -i "s/SRC_NAME=busybox.*/SRC_NAME=busybox-${{ github.event.inputs.busyboxver }}/g" ./Makefile
         cd $WORK_PATH/trunk
         sed -i "s/busybox_id=.*/busybox_id=\"${{ github.event.inputs.busyboxver }}\"/g" ./build_firmware_modify
-        
-    - name: Recovery bin files download from remote
+
+    - name: newly build boards
       run: |
-        cd /opt/PSG1208s/
-        sh install_Setconfig.sh
-        #
-        cd /opt/padavan/touming-Theme/
-        sh install_Theme.sh
+        cd $WORK_PATH/trunk/configs/boards
+        mkdir $TNAME
+          
+    - name: Recovery Padavan files download from remote
+      if: github.event.inputs.padavanbin == 'true'
+      run: |
+        cd Padavan
+        sh install_Padavan-Setconfig.sh
+    - name: Recovery asp files download from remote
+      if: github.event.inputs.padavanbin == 'true'
+      run: |
+        cp -f asp/Advanced_smartdns.asp $WORK_PATH/trunk/user/www/n56u_ribbon_fixed/Advanced_smartdns.asp
+    - name: Recovery bin files download from remote
+      if: github.event.inputs.config == 'true'
+      run: |
+        cp -f $TNAME/$TNAME.config $WORK_PATH/trunk/configs/templates/$TNAME.config
+        cp -f $TNAME/board.h $WORK_PATH/trunk/configs/boards/$TNAME/board.h
+        cp -f $TNAME/board.mk $WORK_PATH/trunk/configs/boards/$TNAME/board.mk
+        cp -f $TNAME/kernel-3.4.x.config $WORK_PATH/trunk/configs/boards/$TNAME/kernel-3.4.x.config
+        #cd $WORK_PATH/trunk/tools
+        #sed -i "s#1.15.2#1.17.1#g" ./Makefile
+        #sed -i "s#https://golang.google.cn/dl#https://dl.google.com/go#g" ./Makefile
+        echo "复制配置文件结束"  
+    - name: Recovery theme files download from remote
+      if: github.event.inputs.theme == 'true'
+      run: |
+        sudo rm -rf $WORK_PATH/trunk/user/www/n56u_ribbon_fixed/bootstrap
+        sudo rm -rf $WORK_PATH/trunk/user/www/n56u_ribbon_fixed/images
+        cp -rf theme/. $WORK_PATH/trunk/user/www/n56u_ribbon_fixed
+        echo "复制主题文件结束"  
+    - name: Recovery wifi files download from remote
+      if: github.event.inputs.wifi == 'true'
+      run: |
+        cd wifi
+        sh install_wifi.sh
         
     - name: Build Firmware
-      env:
-        TNAME: PSG1208s
-        KERNEL: 3.4
       run: |
         cd /opt/rt-n56u/trunk
         if [ ! -f configs/templates/$TNAME.config ] ; then
